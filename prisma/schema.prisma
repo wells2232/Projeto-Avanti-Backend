@@ -1,0 +1,112 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Items {
+  id                   String   @id @default(uuid()) @db.Uuid
+  item_name            String
+  description          String?
+  image_url            String?
+  exchange_preferences String?
+  created_at           DateTime @default(now())
+
+  userId      String @db.Uuid
+  statusId    String @db.Uuid
+  conditionId String @db.Uuid
+
+  status    ItemStatuses   @relation(fields: [statusId], references: [id])
+  condition ItemConditions @relation(fields: [conditionId], references: [id])
+  user      Users          @relation(fields: [userId], references: [id])
+
+  categories ItemCategory[]
+  Proposal   Proposal[]
+}
+
+model ItemStatuses {
+  id          String  @id @default(uuid()) @db.Uuid
+  status_name String  @unique
+  description String?
+  Items       Items[]
+}
+
+model ItemConditions {
+  id          String  @id @default(uuid()) @db.Uuid
+  condition   String  @unique
+  description String?
+  Items       Items[]
+}
+
+model Category {
+  id            String         @id @default(uuid()) @db.Uuid
+  category_name String         @unique
+  created_at    DateTime       @default(now())
+  ItemCategory  ItemCategory[]
+}
+
+model ItemCategory {
+  id         String @id @default(uuid()) @db.Uuid
+  itemId     String @db.Uuid
+  categoryId String @db.Uuid
+
+  item     Items    @relation(fields: [itemId], references: [id])
+  category Category @relation(fields: [categoryId], references: [id])
+
+  @@unique([itemId, categoryId])
+}
+
+model Users {
+  id         String     @id @default(uuid()) @db.Uuid
+  name       String
+  email      String     @unique
+  password   String
+  phone      String?
+  address    String?
+  city       String?
+  created_at DateTime   @default(now())
+  Items      Items[]
+  Proposal   Proposal[]
+}
+
+model Proposal {
+  id         String   @id @default(uuid()) @db.Uuid
+  message    String?
+  created_at DateTime @default(now())
+
+  proposerId   String @db.Uuid
+  targerItemId String @db.Uuid
+  statusId     String @db.Uuid
+
+  proposer     Users                  @relation(fields: [proposerId], references: [id])
+  targetItem   Items                  @relation(fields: [targerItemId], references: [id])
+  status       ProposalStatuses       @relation(fields: [statusId], references: [id])
+  offeredItems ProposalOfferedItems[]
+}
+
+model ProposalOfferedItems {
+  id String @id @default(uuid()) @db.Uuid
+
+  proposalId String   @db.Uuid
+  itemId     String   @db.Uuid
+  Proposal   Proposal @relation(fields: [proposalId], references: [id])
+
+  @@unique([proposalId, itemId])
+}
+
+model ProposalStatuses {
+  id          String  @id @default(uuid()) @db.Uuid
+  status_name String  @unique
+  description String?
+
+  Proposal Proposal[]
+}
