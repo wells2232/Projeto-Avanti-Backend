@@ -2,10 +2,18 @@ const express = require("express");
 const userRouter = require("./routes/userRouter");
 const itemRouter = require("./routes/itemRouter");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 
 const app = express();
 
-app.use(cors());
+const corsOptions = {
+  origin: "http://localhost:5500", // Adjust this to your frontend URL
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+
+app.use(cookieParser());
 
 app.use(express.json());
 

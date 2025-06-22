@@ -18,8 +18,18 @@ async function register(userData) {
     password: hashedPassword,
   });
 
+  const payload = {
+    id: newUser.id,
+    name: newUser.name,
+  };
+
+  const token = jwt.sign(payload, process.env.JWT_SECRET, {
+    expiresIn: "2h",
+  });
+
   const { password: _, ...userWithoutPassword } = newUser;
-  return userWithoutPassword;
+
+  return { user: userWithoutPassword, token };
 }
 
 async function login(email, password) {

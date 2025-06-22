@@ -10,7 +10,22 @@ async function handleRegister(req, res) {
         .json({ error: "Todos os campos são obrigatórios" });
     }
 
-    const newUser = await userServices.register({ name, email, password });
+    const { newUser, token } = await userServices.register({
+      name,
+      email,
+      password,
+    });
+
+    res.cookie("accessToken", token, {
+      httpOnly: true,
+      // secure: process.env.NODE_ENV === "production", // Use secure cookies in production
+      sameSite: "Lax", // Adjust as needed
+      secure: false,
+      path: "/", // Ensure the cookie is accessible across your application
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+      domain: "localhost",
+    });
+
     return res
       .status(201)
       .json({ message: "Usuário registrado com sucesso", user: newUser });
@@ -31,10 +46,39 @@ async function handleLogin(req, res) {
     }
 
     const { token } = await userServices.login(email, password);
-    return res.status(200).json({ token });
+
+    res.cookie("accessToken", token, {
+      httpOnly: true,
+      // secure: process.env.NODE_ENV === "production", // Use secure cookies in production
+      sameSite: "Lax", // Adjust as needed
+      secure: false,
+      path: "/", // Ensure the cookie is accessible across your application
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+      domain: "localhost",
+    });
+
+    return res.status(200).json({ message: "Login realizado com sucesso" });
   } catch (error) {
     return res.status(401).json({ message: error.message });
   }
+}
+
+async function handleGetCurrentUser(req, res) {
+  try {
+    const user = req.user; // Assuming user is set by auth middleware
+    if (!user) {
+      return res.status(401).json({ error: "Usuário não autenticado" });
+    }
+    return res.status(200).json(user);
+  } catch (error) {
+    console.error("Erro ao obter usuário atual:", error);
+    return res.status(500).json({ error: "Erro interno do servidor" });
+  }
+}
+
+async function handleLogout(req, res) {
+  res.clearCookie("accessToken");
+  return res.status(200).json({ message: "Logout realizado com sucesso" });
 }
 
 // async function handleGetAllUsers(req, res) {
@@ -51,5 +95,7 @@ module.exports = {
   userController: {
     handleRegister,
     handleLogin,
+    handleLogout,
+    handleGetCurrentUser,
   },
 };
