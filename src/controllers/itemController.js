@@ -26,7 +26,24 @@ async function handleCreateItem(req, res) {
 async function handleGetAllItems(req, res) {
   try {
     const items = await itemService.findAllItems();
-    res.status(200).json(items);
+
+    const formattedItems = items.map((item) => ({
+      id: item.id,
+      itemName: item.item_name,
+      description: item.description,
+      condition: item.condition.condition,
+      status: item.status.status_name,
+      categories: item.categories.map((cat) => ({
+        id: cat.category.id,
+        name: cat.category.category_name,
+      })),
+      user: {
+        id: item.user.id,
+        name: item.user.name,
+      },
+    }));
+
+    res.status(200).json(formattedItems);
   } catch (error) {
     return res
       .status(500)

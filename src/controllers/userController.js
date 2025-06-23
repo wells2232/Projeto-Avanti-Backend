@@ -31,7 +31,7 @@ async function handleRegister(req, res) {
       .json({ message: "Usuário registrado com sucesso", user: newUser });
   } catch (error) {
     if (error.message === "Este e-mail já está em uso") {
-      return res.status(409).json({ error: error.message });
+      return res.status(409).json({ type: "Conflict", message: error.message });
     }
     console.error("Erro ao registrar usuário:", error);
     return res.status(500).json({ error: "Erro interno do servidor" });
