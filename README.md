@@ -10,8 +10,8 @@ Desenvolver uma aplicação backend robusta, aplicando boas práticas de program
 
 - Node.js
 - Express
-- MongoDB (ou outra base de dados, conforme definido pelo grupo)
-- Outras dependências a serem adicionadas conforme necessidade
+- PostgresSQL
+- Prisma ORM
 
 ## Como Contribuir
 
