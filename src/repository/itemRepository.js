@@ -11,6 +11,8 @@ async function findAllItems(page = 1, limit = 10) {
         id: true,
         item_name: true,
         description: true,
+        image_url: true,
+        image_public_id: true,
         categories: {
           select: {
             category: {
@@ -57,6 +59,8 @@ async function create(itemData, categoryIds) {
       data: {
         item_name: itemData.name,
         description: itemData.description,
+        image_url: itemData.image_url, // Optional image URL
+        image_public_id: itemData.imageId, // Optional image ID
         userId: itemData.userId, // Assuming userId is passed in itemData
         conditionId: itemData.conditionId || 1, // Default to condition ID 1 if not provided
         statusId: itemData.statusId || 1, // Default to status ID 1 if not provided

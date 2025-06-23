@@ -1,15 +1,16 @@
 const itemRepository = require("../repository/itemRepository");
 
-async function createItem(itemData, categoryIds, userId) {
+async function createItem(itemData, categoryIds, userId, imageFile) {
   const dataForRepo = {
     ...itemData,
     userId: userId,
+    image_url: imageFile ? imageFile.path : null,
+    imageId: imageFile ? imageFile.filename : null,
   };
 
   console.log("Data for repository:", dataForRepo);
-  console.log("Category IDs:", categoryIds);
 
-  const item = itemRepository.create(dataForRepo, categoryIds);
+  const item = await itemRepository.create(dataForRepo, categoryIds);
   return item;
 }
 
@@ -30,7 +31,7 @@ async function deleteItem(itemId, userId) {
 
   if (item.userId !== userId) {
     const err = new Error("Você não tem permissão para deletar este item.");
-    err.name("UnauthorizedError");
+    err.name = "UnauthorizedError";
     throw err;
   }
   return await itemRepository.deleteItem(itemId);

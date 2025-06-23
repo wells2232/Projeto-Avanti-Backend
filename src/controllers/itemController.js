@@ -2,19 +2,27 @@ const itemService = require("../services/itemService");
 
 async function handleCreateItem(req, res) {
   try {
-    const { itemName, description, conditionId, statusId, categoryIds } =
+    console.log("req.body recebido:", req.body);
+
+    const { item_name, description, conditionId, statusId, categoryIds } =
       req.body;
 
     const userId = req.user.id;
+    const imageFile = req.file; // Arquivo de imagem enviado
 
     const itemData = {
-      name: itemName,
-      description: description || "", // Default to empty string if not provided
-      conditionId: conditionId || 1, // Default condition to 1 if not provided
-      statusId: statusId || 1, // Default status to 1 if not provided
+      name: item_name,
+      description: description,
+      conditionId: conditionId,
+      statusId: statusId,
     };
 
-    const newItem = await itemService.createItem(itemData, categoryIds, userId);
+    const newItem = await itemService.createItem(
+      itemData,
+      categoryIds,
+      userId,
+      imageFile
+    );
     res.status(201).json(newItem);
   } catch (error) {
     return res
