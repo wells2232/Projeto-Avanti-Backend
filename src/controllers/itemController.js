@@ -25,7 +25,13 @@ async function handleCreateItem(req, res) {
 
 async function handleGetAllItems(req, res) {
   try {
-    const items = await itemService.findAllItems();
+    const page = parseInt(req.query.page) || 1; // Padrão para a página 1
+    const limit = parseInt(req.query.limit) || 50; // Padrão para 10 itens por página
+
+    const { items, total, totalPages } = await itemService.findAllItems(
+      page,
+      limit
+    );
 
     const formattedItems = items.map((item) => ({
       id: item.id,
@@ -43,7 +49,13 @@ async function handleGetAllItems(req, res) {
       },
     }));
 
-    res.status(200).json(formattedItems);
+    res.status(200).json({
+      page,
+      limit,
+      totalItems: total,
+      totalPages,
+      items: formattedItems,
+    });
   } catch (error) {
     return res
       .status(500)
@@ -51,9 +63,25 @@ async function handleGetAllItems(req, res) {
   }
 }
 
+async function handleDeleteItem(req, res) {
+  try {
+    const itemId = req.params.id;
+    const userId = req.user.id;
+
+    await itemService.deleteItem(itemId, userId);
+
+    res.status(200).json({ message: "Item deletado com sucesso." });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: error.message || "Erro ao deletar o item." });
+  }
+}
+
 module.exports = {
   itemController: {
     handleCreateItem,
     handleGetAllItems,
+    handleDeleteItem,
   },
 };

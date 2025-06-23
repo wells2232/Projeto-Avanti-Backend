@@ -29,8 +29,9 @@ model Items {
   condition ItemConditions @relation(fields: [conditionId], references: [id])
   user      Users          @relation(fields: [userId], references: [id])
 
-  categories ItemCategory[]
-  Proposal   Proposal[]
+  categories           ItemCategory[]
+  Proposal             Proposal[]
+  ProposalOfferedItems ProposalOfferedItems[]
 }
 
 model ItemStatuses {
@@ -59,7 +60,7 @@ model ItemCategory {
   itemId     String @db.Uuid
   categoryId String @db.Uuid
 
-  item     Items    @relation(fields: [itemId], references: [id])
+  item     Items    @relation(fields: [itemId], references: [id], onDelete: Cascade)
   category Category @relation(fields: [categoryId], references: [id])
 
   @@unique([itemId, categoryId])
@@ -88,7 +89,7 @@ model Proposal {
   statusId     String @db.Uuid
 
   proposer     Users                  @relation(fields: [proposerId], references: [id])
-  targetItem   Items                  @relation(fields: [targerItemId], references: [id])
+  targetItem   Items                  @relation(fields: [targerItemId], references: [id], onDelete: Cascade)
   status       ProposalStatuses       @relation(fields: [statusId], references: [id])
   offeredItems ProposalOfferedItems[]
 }
@@ -99,6 +100,7 @@ model ProposalOfferedItems {
   proposalId String   @db.Uuid
   itemId     String   @db.Uuid
   Proposal   Proposal @relation(fields: [proposalId], references: [id])
+  item       Items    @relation(fields: [itemId], references: [id], onDelete: Cascade)
 
   @@unique([proposalId, itemId])
 }

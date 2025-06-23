@@ -13,12 +13,36 @@ async function createItem(itemData, categoryIds, userId) {
   return item;
 }
 
-async function findAllItems() {
-  const items = await itemRepository.findAllItems();
-  return items;
+async function findAllItems(page = 1, limit = 10) {
+  return await itemRepository.findAllItems(page, limit);
+}
+
+async function deleteItem(itemId, userId) {
+  const item = await itemRepository.findById(itemId);
+
+  if (!itemId) {
+    throw new Error("ID do item não fornecido.");
+  }
+
+  if (!item) {
+    throw new Error("Item não encontrado.");
+  }
+
+  if (item.userId !== userId) {
+    const err = new Error("Você não tem permissão para deletar este item.");
+    err.name("UnauthorizedError");
+    throw err;
+  }
+  return await itemRepository.deleteItem(itemId);
+}
+
+async function findItemById(itemId) {
+  return await itemRepository.findById(itemId);
 }
 
 module.exports = {
   createItem,
   findAllItems,
+  deleteItem,
+  findItemById,
 };

@@ -8,4 +8,6 @@ itemRouter.post("/", authenticateToken, itemController.handleCreateItem);
 
 itemRouter.get("/", itemController.handleGetAllItems);
 
+itemRouter.delete("/:id", authenticateToken, itemController.handleDeleteItem);
+
 module.exports = itemRouter;

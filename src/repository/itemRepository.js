@@ -1,39 +1,54 @@
 const prisma = require("../lib/prisma");
 
-async function findAllItems() {
-  return await prisma.items.findMany({
-    select: {
-      id: true,
-      item_name: true,
-      description: true,
-      categories: {
-        select: {
-          category: {
-            select: {
-              id: true,
-              category_name: true,
+async function findAllItems(page = 1, limit = 10) {
+  const skip = (page - 1) * limit;
+
+  const [items, total] = await Promise.all([
+    prisma.items.findMany({
+      skip: skip,
+      take: limit,
+      select: {
+        id: true,
+        item_name: true,
+        description: true,
+        categories: {
+          select: {
+            category: {
+              select: {
+                id: true,
+                category_name: true,
+              },
             },
           },
         },
-      },
-      user: {
-        select: {
-          id: true,
-          name: true,
+        user: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        condition: {
+          select: {
+            condition: true, // Apenas o nome da condição
+          },
+        },
+        status: {
+          select: {
+            status_name: true, // Apenas o nome do status
+          },
         },
       },
-      condition: {
-        select: {
-          condition: true, // Apenas o nome da condição
-        },
-      },
-      status: {
-        select: {
-          status_name: true, // Apenas o nome do status
-        },
-      },
-    },
-  });
+    }),
+    prisma.items.count(),
+  ]);
+
+  return {
+    items,
+    total,
+    page,
+    limit,
+    totalPages: Math.ceil(total / limit),
+  };
 }
 
 async function create(itemData, categoryIds) {
@@ -62,7 +77,21 @@ async function create(itemData, categoryIds) {
   });
 }
 
+async function deleteItem(itemId) {
+  return prisma.items.delete({
+    where: { id: itemId },
+  });
+}
+
+async function findById(itemId) {
+  return prisma.items.findUnique({
+    where: { id: itemId },
+  });
+}
+
 module.exports = {
   create,
   findAllItems,
+  deleteItem,
+  findById,
 };
