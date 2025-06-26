@@ -1,14 +1,14 @@
 const express = require("express");
 const userRouter = require("./routes/userRouter");
 const itemRouter = require("./routes/itemRouter");
+const proposalRouter = require("./routes/proposalRouter");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 
 const app = express();
 
 const corsOptions = {
-  origin: "http://127.0.0.1:5500", // Adjust this to your frontend URL
-  credentials: true,
+  origin: "http://localhost:5500", // Frontend URL
 };
 
 app.use(cors(corsOptions));
@@ -20,6 +20,8 @@ app.use(express.json());
 app.use("/api", userRouter);
 
 app.use("/api/items", itemRouter);
+
+app.use("/api/proposals", proposalRouter);
 
 app.get("/", (req, res) => {
   res.send("Welcome to the API!");

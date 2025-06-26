@@ -19,9 +19,9 @@ async function handleRegister(req, res) {
     res.cookie("accessToken", token, {
       httpOnly: true,
       // secure: process.env.NODE_ENV === "production", // Use secure cookies in production
-      sameSite: "Lax", // Adjust as needed
+      sameSite: "None",
       secure: false,
-      path: "/", // Ensure the cookie is accessible across your application
+      path: "/",
       maxAge: 24 * 60 * 60 * 1000, // 1 day
       domain: "localhost",
     });

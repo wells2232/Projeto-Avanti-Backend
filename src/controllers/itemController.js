@@ -2,8 +2,6 @@ const itemService = require("../services/itemService");
 
 async function handleCreateItem(req, res) {
   try {
-    console.log("req.body recebido:", req.body);
-
     const { item_name, description, conditionId, statusId, categoryIds } =
       req.body;
 
@@ -33,8 +31,8 @@ async function handleCreateItem(req, res) {
 
 async function handleGetAllItems(req, res) {
   try {
-    const page = parseInt(req.query.page) || 1; // Padrão para a página 1
-    const limit = parseInt(req.query.limit) || 50; // Padrão para 10 itens por página
+    const page = parseInt(req.query.page) || 1; // Padrão de página 1
+    const limit = parseInt(req.query.limit) || 10; // Padrão de 10 itens por página
 
     const { items, total, totalPages } = await itemService.findAllItems(
       page,
@@ -47,6 +45,8 @@ async function handleGetAllItems(req, res) {
       description: item.description,
       condition: item.condition.condition,
       status: item.status.status_name,
+      imageUrl: item.image_url,
+      imageId: item.imageId,
       categories: item.categories.map((cat) => ({
         id: cat.category.id,
         name: cat.category.category_name,
@@ -86,10 +86,42 @@ async function handleDeleteItem(req, res) {
   }
 }
 
+async function handleUpdateItem(req, res) {
+  try {
+    const itemId = req.params.id;
+    const { item_name, description, conditionId, statusId, categoryIds } =
+      req.body;
+    const userId = req.user.id;
+    const imageFile = req.file; // Arquivo de imagem enviado
+
+    const itemData = {
+      name: item_name,
+      description: description,
+      conditionId: conditionId,
+      statusId: statusId,
+    };
+
+    const updatedItem = await itemService.updateItem(
+      itemId,
+      itemData,
+      categoryIds,
+      userId,
+      imageFile
+    );
+
+    res.status(200).json(updatedItem);
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: error.message || "Erro ao atualizar o item." });
+  }
+}
+
 module.exports = {
   itemController: {
     handleCreateItem,
     handleGetAllItems,
     handleDeleteItem,
+    handleUpdateItem,
   },
 };

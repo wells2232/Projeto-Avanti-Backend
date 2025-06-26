@@ -8,10 +8,33 @@ async function createItem(itemData, categoryIds, userId, imageFile) {
     imageId: imageFile ? imageFile.filename : null,
   };
 
-  console.log("Data for repository:", dataForRepo);
+  // console.log("Data for repository:", dataForRepo);
 
   const item = await itemRepository.create(dataForRepo, categoryIds);
   return item;
+}
+
+async function updateItem(itemId, itemData, categoryIds, userId, imageFile) {
+  const item = await itemRepository.findById(itemId);
+  if (!itemId) {
+    throw new Error("ID do item não fornecido.");
+  }
+  if (!item) {
+    throw new Error("Item não encontrado.");
+  }
+  if (item.userId !== userId) {
+    const err = new Error("Você não tem permissão para atualizar este item.");
+    err.name = "UnauthorizedError";
+    throw err;
+  }
+  const dataForRepo = {
+    ...itemData,
+    userId: userId,
+    image_url: imageFile ? imageFile.path : null,
+    imageId: imageFile ? imageFile.filename : null,
+  };
+
+  return await itemRepository.updateItem(itemId, dataForRepo, categoryIds);
 }
 
 async function findAllItems(page = 1, limit = 10) {
@@ -46,4 +69,5 @@ module.exports = {
   findAllItems,
   deleteItem,
   findItemById,
+  updateItem,
 };

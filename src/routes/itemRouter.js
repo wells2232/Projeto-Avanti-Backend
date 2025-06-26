@@ -25,4 +25,12 @@ itemRouter.get("/", itemController.handleGetAllItems);
 
 itemRouter.delete("/:id", authenticateToken, itemController.handleDeleteItem);
 
+itemRouter.put(
+  "/:id",
+  authenticateToken,
+  upload.single("itemImage"),
+  logRequestState,
+  itemController.handleUpdateItem
+);
+
 module.exports = itemRouter;

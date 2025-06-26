@@ -87,11 +87,11 @@ model Proposal {
   created_at DateTime @default(now())
 
   proposerId   String @db.Uuid
-  targerItemId String @db.Uuid
+  targetItemId String @db.Uuid
   statusId     String @db.Uuid
 
   proposer     Users                  @relation(fields: [proposerId], references: [id])
-  targetItem   Items                  @relation(fields: [targerItemId], references: [id], onDelete: Cascade)
+  targetItem   Items                  @relation(fields: [targetItemId], references: [id], onDelete: Cascade)
   status       ProposalStatuses       @relation(fields: [statusId], references: [id])
   offeredItems ProposalOfferedItems[]
 }

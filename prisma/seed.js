@@ -39,6 +39,21 @@ async function main() {
     skipDuplicates: true,
   });
 
+  await prisma.proposalStatuses.createMany({
+    data: [
+      {
+        status_name: "Pendente",
+        description: "Proposta pendente de resposta.",
+      },
+      { status_name: "Aceita", description: "Proposta aceita pelo usuário." },
+      {
+        status_name: "Recusada",
+        description: "Proposta recusada pelo usuário.",
+      },
+    ],
+    skipDuplicates: true,
+  });
+
   // Inserindo algumas categorias de exemplo
   await prisma.category.createMany({
     data: [

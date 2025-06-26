@@ -23,7 +23,7 @@ function validateRegister(req, res, next) {
   }
 
   // validação de senha (mínimo 6 caracteres)
-  if (!password || password.length < 8) {
+  if (!password || password.length < 6) {
     return res
       .status(400)
       .json({ message: "Senha deve ter ao menos 6 caracteres." });

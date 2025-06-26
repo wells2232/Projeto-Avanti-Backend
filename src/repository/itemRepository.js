@@ -93,9 +93,40 @@ async function findById(itemId) {
   });
 }
 
+async function updateItem(itemId, itemData, categoryIds) {
+  return prisma.$transaction(async (tx) => {
+    const item = await tx.items.update({
+      where: { id: itemId },
+      data: {
+        item_name: itemData.name,
+        description: itemData.description,
+        image_url: itemData.image_url, // Optional image URL
+        image_public_id: itemData.imageId, // Optional image ID
+        userId: itemData.userId, // Assuming userId is passed in itemData
+        conditionId: itemData.conditionId || 1, // Default to condition ID 1 if not provided
+        statusId: itemData.statusId || 1, // Default to status ID 1 if not provided
+
+        categories: {
+          deleteMany: {}, // Remove all existing categories
+          create: categoryIds.map((catId) => ({
+            category: {
+              connect: {
+                id: catId,
+              },
+            },
+          })),
+        },
+      },
+    });
+
+    return item;
+  });
+}
+
 module.exports = {
   create,
   findAllItems,
   deleteItem,
   findById,
+  updateItem,
 };
