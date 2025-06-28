@@ -83,6 +83,53 @@ async function handleFindUserProposals(req, res) {
   }
 }
 
+async function handleDeleteProposal(req, res) {
+  try {
+    const id = req.params.id;
+    const proposerId = req.user.id;
+
+    await proposalService.deleteItem(id, proposerId);
+
+    res.status(200).json({ message: "Proposta deletado com sucesso." });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: error.message || "Erro ao deletar o proposta." });
+  }
+}
+
+async function handleUpdateProposal(req, res) {
+  try {
+    const itemId = req.params.id;
+    const { item_name, description, conditionId, statusId, categoryIds } =
+      req.body;
+    const userId = req.user.id;
+    const imageFile = req.file; // Arquivo de imagem enviado
+
+    const itemData = {
+      name: item_name,
+      description: description,
+      conditionId: conditionId,
+      statusId: statusId,
+    };
+
+    const updatedItem = await itemService.updateItem(
+      itemId,
+      itemData,
+      categoryIds,
+      userId,
+      imageFile
+    );
+
+    res.status(200).json(updatedItem);
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: error.message || "Erro ao atualizar o item." });
+  }
+}
+
+
 module.exports = {
-  proposalController: { handleCreateProposal, handleFindUserProposals },
+  proposalController: { handleCreateProposal, handleFindUserProposals, handleDeleteProposal, handleUpdateProposal },
 };

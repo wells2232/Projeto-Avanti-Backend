@@ -4,12 +4,11 @@ const proposalRepository = require("../repository/proposalRepository");
 async function createProposal(proposalData, offeredItemIds, proposerId) {
   const { message, targetItemId, statusId } = proposalData;
 
-  // Validar se o usuário existe
+  // Validar se o usuário 
   if (!proposerId) {
     throw new Error("ID não fornecido.");
   }
 
-  // Validar se ja existe uma proposta para o item alvo
   const existingProposal =
     await proposalRepository.findProposalByTargetIdAndProposerId(
       targetItemId,
@@ -21,7 +20,7 @@ async function createProposal(proposalData, offeredItemIds, proposerId) {
     );
   }
 
-  // Validar se o item alvo existe
+  // Validar se o item alvo 
   if (!targetItemId) {
     throw new Error("ID do item alvo não fornecido.");
   }

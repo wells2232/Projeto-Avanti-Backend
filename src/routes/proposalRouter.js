@@ -18,4 +18,16 @@ proposalRouter.get(
   proposalController.handleFindUserProposals
 );
 
+proposalRouter.delete("/:id", authenticateToken, proposalController.handleDeleteProposal);
+
+// proposalRouter.put(
+//   "/:id",
+//   authenticateToken,
+//   upload.single("itemImage"),
+//   logRequestState,
+//   proposalController.handleUpdateItem
+// );
+
+
+
 module.exports = proposalRouter;
