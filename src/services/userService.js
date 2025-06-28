@@ -56,7 +56,24 @@ async function login(email, password) {
   return { token };
 }
 
+async function updateUser(id, userData) {
+  const dataForRepo = userData;
+
+  const user = await userRepository.findUserByEmail(userData.email);
+  if (user && user.id !== id) {
+    throw new Error("Este e-mail já está em uso");
+  }
+
+  if (!userData.email) {
+    dataForRepo.email = user.email.trim().toLowerCase();
+  }
+
+  const updatedUser = await userRepository.update(id, dataForRepo);
+  return updatedUser;
+}
+
 module.exports = {
   register,
   login,
+  updateUser,
 };

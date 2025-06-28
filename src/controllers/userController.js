@@ -90,11 +90,41 @@ async function handleLogout(req, res) {
 //   }
 // }
 
+async function handleUpdateUser(req, res) {
+  const userId = req.params.id;
+  const { name, email, phone, address, city } = req.body;
+
+  if (!name || !email) {
+    return res.status(400).json({ error: "Nome e email são obrigatórios" });
+  }
+
+  try {
+    const updatedUser = await userServices.updateUser(userId, {
+      name: name,
+      email: email.trim().toLowerCase() || null,
+      phone: phone || null,
+      address: address || null,
+      city: city || null,
+    });
+
+    return res.status(200).json({
+      message: "Usuário atualizado com sucesso",
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.error("Erro ao atualizar usuário:", error);
+    return res
+      .status(500)
+      .json({ error: "Erro interno do servidor:" + error.message });
+  }
+}
+
 module.exports = {
   userController: {
     handleRegister,
     handleLogin,
     handleLogout,
     handleGetCurrentUser,
+    handleUpdateUser,
   },
 };
