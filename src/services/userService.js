@@ -11,10 +11,11 @@ async function register(userData) {
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
+  const formattedEmail = email.trim().toLowerCase();
 
   const newUser = await userRepository.create({
     name,
-    email,
+    email: formattedEmail,
     password: hashedPassword,
   });
 
@@ -33,7 +34,8 @@ async function register(userData) {
 }
 
 async function login(email, password) {
-  const user = await userRepository.findUserByEmail(email);
+  const formattedEmail = email.trim().toLowerCase();
+  const user = await userRepository.findUserByEmail(formattedEmail);
   if (!user) {
     throw new Error("Credenciais inválidas");
   }

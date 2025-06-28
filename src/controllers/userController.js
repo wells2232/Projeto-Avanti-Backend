@@ -49,11 +49,10 @@ async function handleLogin(req, res) {
 
     res.cookie("accessToken", token, {
       httpOnly: true,
-      // secure: process.env.NODE_ENV === "production", // Use secure cookies in production
-      sameSite: "Lax", // Adjust as needed
+      sameSite: "Lax",
       secure: false,
-      path: "/", // Ensure the cookie is accessible across your application
-      maxAge: 24 * 60 * 60 * 1000, // 1 day
+      path: "/",
+      maxAge: 24 * 60 * 60 * 1000, // 1 dia
       domain: "localhost",
     });
 
@@ -65,7 +64,7 @@ async function handleLogin(req, res) {
 
 async function handleGetCurrentUser(req, res) {
   try {
-    const user = req.user; // Assuming user is set by auth middleware
+    const user = req.user;
     if (!user) {
       return res.status(401).json({ error: "Usuário não autenticado" });
     }
