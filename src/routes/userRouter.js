@@ -21,4 +21,10 @@ userRouter.get(
   userController.handleGetCurrentUser
 );
 
+userRouter.patch(
+  "/user/update/:id",
+  authenticateToken,
+  userController.handleUpdateUser
+);
+
 module.exports = userRouter;

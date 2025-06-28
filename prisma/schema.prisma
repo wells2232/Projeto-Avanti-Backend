@@ -108,9 +108,8 @@ model ProposalOfferedItems {
 }
 
 model ProposalStatuses {
-  id          String  @id @default(uuid()) @db.Uuid
-  status_name String  @unique
+  id          String     @id @default(uuid()) @db.Uuid
+  status_name String     @unique
   description String?
-
-  Proposal Proposal[]
+  Proposal    Proposal[]
 }
