@@ -69,8 +69,29 @@ async function findProposalsReceived(userId, page = 1, limit = 10) {
 
 }
 
+
+async function deleteProposal(id, proposerId) {
+  // verifica se o id da proposta ou usuario existe no BD
+  if (!id || !proposerId) {
+    throw new Error("ID da proposta ou do usuário não fornecido.");
+  }
+
+// Chama o repositorio que faz o delete dessa proposta por id e atribui essa remoção dessa proposta a variavel 'deleted' 
+  const deleted = await proposalRepository.deleteProposalById(id, proposerId);
+
+// Se 'deleted' estiver vazia então mostra o erro 
+  if (deleted.count === 0) {
+    throw new Error("Proposta não encontrada ou não pertence ao usuário.");
+  }
+
+// Quando é feito a remoção da proposta retorna essa mensagem
+  return { message: "Proposta deletada com sucesso." };
+}
+
+
 module.exports = {
   createProposal,
   findUserProposals,
   findProposalsReceived,
+  deleteProposal
 };

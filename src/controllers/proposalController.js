@@ -144,24 +144,30 @@ async function handleReceivedUserProposals(req, res) {
   }
 }
 
-// async function handleDeleteProposal(req, res) {
-//   try {
-//     const id = req.params.id;
-//     const proposerId = req.user.id;
+async function handleDeleteProposal(req, res) {
+  try {
+     // Define que a Id da proposta vira no params 
+    const id = req.params.id;
 
-//     await proposalService.deleteItem(id, proposerId);
+    // Define que o Id do usuario que atualizou a proposta será o usuario atual. 
+    const proposerId = req.user.id;
 
-//     res.status(200).json({ message: "Proposta deletado com sucesso." });
-//   } catch (error) {
-//     return res
-//       .status(500)
-//       .json({ message: error.message || "Erro ao deletar o proposta." });
-//   }
-// }
+    // Chama o repositorio de remoção de proposta e atribui a remoção a variavel 'result'
+    const result = await proposalService.deleteProposal(id, proposerId);
+
+    // Mensagem exibida quando a remoção é realizada
+    res.status(200).json({ message: "Proposta deletado com sucesso." });
+
+    // Se der erro vai retornar essa mensagem
+  } catch (error) {
+    return res.status(500).json({ 
+      message: error.message || "Erro ao deletar o proposta." });
+  }
+}
 
 // async function handleUpdateProposal(req, res) {
 //   try {
-//     const itemId = req.params.id;
+//     const Id = req.params.id;
 //     const { item_name, description, conditionId, statusId, categoryIds } =
 //       req.body;
 //     const userId = req.user.id;
@@ -195,6 +201,7 @@ module.exports = {
   proposalController: { handleCreateProposal, 
                         handleFindUserProposals,
                         handleReceivedUserProposals, 
-                        // handleDeleteProposal, handleUpdateProposal 
+                        handleDeleteProposal, 
+                        // handleUpdateProposal 
                       },
 };

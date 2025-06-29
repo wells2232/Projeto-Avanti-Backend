@@ -1,3 +1,4 @@
+const { where } = require("sequelize");
 const prisma = require("../lib/prisma");
 
 async function create(proposalData, offeredItemIds) {
@@ -153,9 +154,36 @@ async function findProposalByTargetIdAndProposerId(targetItemId, proposerId) {
   });
 }
 
+// função referente a remoção de alguma proposta
+async function deleteProposalById(id, proposerId) {
+
+  // Cria uma transação garantindo que todos os comandos só serão executados se juntos
+  return prisma.$transaction(async(tx) => {
+
+    // deleta o offeredItem dependente da proposta a ser deletada
+    await tx.ProposalOfferedItems.deleteMany({
+      where: {
+        proposalId : id
+      },
+    });
+
+    // executa o deletemany quando o id da proposta e do proposer forem iguais a algum do banco de dados
+   const deleted = await tx.Proposal.deleteMany({
+    where:{
+      id: id,
+      proposerId: proposerId,
+    },
+   });
+
+   return deleted;
+
+  });
+}
+
 module.exports = {
   create,
   findUserProposals,
   findProposalByTargetIdAndProposerId,
-  findUserReceivedProposals
+  findUserReceivedProposals,
+  deleteProposalById
 };
