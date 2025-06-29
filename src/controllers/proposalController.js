@@ -3,8 +3,11 @@ const proposalService = require("../services/proposalService");
 // Requisita as propostas feita pelo current user 
 async function handleCreateProposal(req, res) {
   try {
-    const { message, targetItemId, statusId, offeredItemIds } = req.body;
+    const { message, targetItemId, offeredItemIds } = req.body;
     const proposerId = req.user.id;
+
+    // Para que toda proposta criada tenha status "Pendente" como default.
+    const statusId = "6b09c9cf-e12b-439b-886e-73c7d71ac29b"
 
     // Validar se o usuário está autenticado
     if (!proposerId) {

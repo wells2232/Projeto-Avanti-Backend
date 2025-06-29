@@ -28,9 +28,6 @@ async function createProposal(proposalData, offeredItemIds, proposerId) {
   // Validar se a mensagem foi fornecida
   if (!message || message.trim() === "") {
     throw new Error("Mensagem não fornecida.");
-  } // Validar se o status foi fornecido
-  if (!statusId) {
-    throw new Error("Status não fornecido.");
   }
 
   // Validar se offeredItemIds é um array
