@@ -49,6 +49,7 @@ async function createProposal(proposalData, offeredItemIds, proposerId) {
   return proposal;
 }
 
+//  Essa função retorna as propostas criadas(made) pelo current user 
 async function findUserProposals(userId, page = 1, limit = 10) {
   if (!userId) {
     throw new Error("ID do usuário não fornecido.");
@@ -61,7 +62,18 @@ async function findUserProposals(userId, page = 1, limit = 10) {
   return proposals;
 }
 
+// Essa função retorna as propostas recebidas(received) pelo current user
+async function findProposalsReceived(userId, page = 1, limit = 10) {
+  if (!userId) {
+    throw new Error("ID do usuário não fornecido.");
+  }
+  
+  return await proposalRepository.findUserReceivedProposals(userId, page, limit);
+
+}
+
 module.exports = {
   createProposal,
   findUserProposals,
+  findProposalsReceived,
 };
