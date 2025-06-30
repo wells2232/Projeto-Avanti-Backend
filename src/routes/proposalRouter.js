@@ -12,10 +12,29 @@ proposalRouter.post(
   proposalController.handleCreateProposal
 );
 
+// Criada para visualizar as propostas criadas(made) pelo current user
 proposalRouter.get(
-  "/me/:id",
+  "/made",
   authenticateToken,
   proposalController.handleFindUserProposals
 );
+
+// Criada para visualizar as propostas recebidas(receveid) pelo current user
+proposalRouter.get(
+  "/received",
+  authenticateToken,
+  proposalController.handleReceivedUserProposals
+);
+
+// Quando for dado o comando HTTP DELETE mais a rota '/id' é chamado o proposal controle de delete
+proposalRouter.delete("/:id", authenticateToken, proposalController.handleDeleteProposal);
+
+proposalRouter.put(
+  "/:id",
+  authenticateToken,
+  proposalController.handleUpdateProposal
+);
+
+
 
 module.exports = proposalRouter;

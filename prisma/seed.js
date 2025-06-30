@@ -1,9 +1,10 @@
+
 // prisma/seed.ts
-const { PrismaClient } = require("@prisma/client");
+const { prisma } = require("@prisma/client");
 const { hash } = require("bcryptjs");
 const Role = require("@prisma/client");
+const prisma = require("../lib/prisma");
 
-const prisma = new PrismaClient();
 
 async function main() {
   console.log("Iniciando o processo de seeding...");

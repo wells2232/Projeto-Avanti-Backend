@@ -1,12 +1,11 @@
 {
-  "name": "avanti-backend",
   "version": "1.0.0",
   "main": "server.js",
   "type": "commonjs",
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo && exit 1"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
