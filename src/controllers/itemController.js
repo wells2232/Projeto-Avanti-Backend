@@ -1,4 +1,3 @@
-const { category } = require("../lib/prisma");
 const itemService = require("../services/itemService");
 const z = require("zod");
 
@@ -34,8 +33,8 @@ async function handleCreateItem(req, res) {
 async function handleGetAllItems(req, res) {
   try {
     const querySchema = z.object({
-      page: z.string().optional().default("1"),
-      limit: z.string().optional().default("10"),
+      page: z.string().transform(Number).optional().default(1),
+      limit: z.string().transform(Number).optional().default(10),
       user_id: z.string().uuid().optional(),
       status_id: z.string().uuid().optional(),
       condition_id: z.string().uuid().optional(),
@@ -70,11 +69,7 @@ async function handleGetAllItems(req, res) {
 
     console.log("Filtro: ", where);
 
-    const result = await itemService.findAllItems(
-      where,
-      Number(page),
-      Number(limit)
-    );
+    const result = await itemService.findAllItems(where, page, limit);
 
     const formattedItems = result.items.map((item) => ({
       id: item.id,

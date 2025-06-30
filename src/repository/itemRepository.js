@@ -43,7 +43,9 @@ async function findAllItems(where, page = 1, limit = 10) {
         },
       },
     }),
-    prisma.items.count(),
+    prisma.items.count({
+      where,
+    }),
   ]);
 
   return {
