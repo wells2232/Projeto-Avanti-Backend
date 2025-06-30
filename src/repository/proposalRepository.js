@@ -1,6 +1,7 @@
 const { where } = require("sequelize");
 const prisma = require("../lib/prisma");
 
+
 async function create(proposalData, offeredItemIds) {
   return prisma.$transaction(async (tx) => {
     const proposal = await tx.proposal.create({
@@ -180,10 +181,23 @@ async function deleteProposalById(id, proposerId) {
   });
 }
 
+
+async function updateProposalById(id, proposerId, updateProposal) {
+  return prisma.proposal.updateMany({
+    where: {
+      id,
+      proposerId, // Garante que só o dono possa atualizar
+    },
+    data: updateProposal,
+  });
+}
+
+
 module.exports = {
   create,
   findUserProposals,
   findProposalByTargetIdAndProposerId,
   findUserReceivedProposals,
-  deleteProposalById
+  deleteProposalById, 
+  updateProposalById
 };

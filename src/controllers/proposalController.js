@@ -165,36 +165,33 @@ async function handleDeleteProposal(req, res) {
   }
 }
 
-// async function handleUpdateProposal(req, res) {
-//   try {
-//     const Id = req.params.id;
-//     const { item_name, description, conditionId, statusId, categoryIds } =
-//       req.body;
-//     const userId = req.user.id;
-//     const imageFile = req.file; // Arquivo de imagem enviado
+async function handleUpdateProposal(req, res) {
+  try {
+    const id = req.params.id;
+    const proposerId = req.user.id;
+    const { message  } =req.body;
 
-//     const itemData = {
-//       name: item_name,
-//       description: description,
-//       conditionId: conditionId,
-//       statusId: statusId,
-//     };
+    // Para que toda proposta editada tenha status "Pendente" como default.
+    const statusId = "6b09c9cf-e12b-439b-886e-73c7d71ac29b"
 
-//     const updatedItem = await itemService.updateItem(
-//       itemId,
-//       itemData,
-//       categoryIds,
-//       userId,
-//       imageFile
-//     );
+    // Validar se o usuário está autenticado
+    if (!proposerId) {
+      return res.status(401).json({ message: "Usuário não autenticado." });
+    };
 
-//     res.status(200).json(updatedItem);
-//   } catch (error) {
-//     return res
-//       .status(500)
-//       .json({ message: error.message || "Erro ao atualizar o item." });
-//   }
-// }
+    const ProposalData = {};
+    if (message) ProposalData.message = message;
+    if (statusId) ProposalData.statusId = statusId;
+
+    const result = await proposalService.updateProposal(id, proposerId, ProposalData);
+
+    res.status(200).json(result);
+  } catch (error) {
+    return res.status(500).json({ 
+      message: error.message || "Erro ao atualizar o item." 
+    });
+  }
+}
 
 
 module.exports = {
@@ -202,6 +199,6 @@ module.exports = {
                         handleFindUserProposals,
                         handleReceivedUserProposals, 
                         handleDeleteProposal, 
-                        // handleUpdateProposal 
+                        handleUpdateProposal 
                       },
 };

@@ -29,13 +29,11 @@ proposalRouter.get(
 // Quando for dado o comando HTTP DELETE mais a rota '/id' é chamado o proposal controle de delete
 proposalRouter.delete("/:id", authenticateToken, proposalController.handleDeleteProposal);
 
-// proposalRouter.put(
-//   "/:id",
-//   authenticateToken,
-//   upload.single("itemImage"),
-//   logRequestState,
-//   proposalController.handleUpdateItem
-// );
+proposalRouter.put(
+  "/:id",
+  authenticateToken,
+  proposalController.handleUpdateProposal
+);
 
 
 
