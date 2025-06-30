@@ -1,9 +1,12 @@
-const { proposal } = require("../lib/prisma");
 const prisma = require("../lib/prisma");
 const proposalRepository = require("../repository/proposalRepository");
 
 async function createProposal(proposalData, offeredItemIds, proposerId) {
-  const { message, targetItemId, statusId } = proposalData;
+  const { message, targetItemId } = proposalData;
+
+  const defaultStatusId = await prisma.proposalStatuses.findFirst({
+    where: { status_name: "Pendente" },
+  });
 
   // Validar se o usuário
   if (!proposerId) {
@@ -69,7 +72,7 @@ async function createProposal(proposalData, offeredItemIds, proposerId) {
     message,
     proposerId,
     targetItemId,
-    statusId,
+    statusId: defaultStatusId.id, // Padrão "Pendente"
   };
 
   const proposal = await proposalRepository.create(dataForRepo, offeredItemIds);

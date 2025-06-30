@@ -63,12 +63,11 @@ async function create(itemData, categoryIds) {
       data: {
         item_name: itemData.name,
         description: itemData.description,
-        image_url: itemData.image_url, // Optional image URL
-        image_public_id: itemData.imageId, // Optional image ID
-        userId: itemData.userId, // Assuming userId is passed in itemData
-        conditionId: itemData.conditionId || 1, // Default to condition ID 1 if not provided
-        statusId: itemData.statusId || 1, // Default to status ID 1 if not provided
-
+        image_url: itemData.image_url,
+        image_public_id: itemData.imageId,
+        userId: itemData.userId,
+        conditionId: itemData.conditionId,
+        statusId: itemData.statusId,
         categories: {
           create: categoryIds.map((catId) => ({
             category: {
