@@ -37,8 +37,8 @@ async function updateItem(itemId, itemData, categoryIds, userId, imageFile) {
   return await itemRepository.updateItem(itemId, dataForRepo, categoryIds);
 }
 
-async function findAllItems(page = 1, limit = 10) {
-  return await itemRepository.findAllItems(page, limit);
+async function findAllItems(where, page = 1, limit = 10) {
+  return await itemRepository.findAllItems(where, page, limit);
 }
 
 async function deleteItem(itemId, userId) {

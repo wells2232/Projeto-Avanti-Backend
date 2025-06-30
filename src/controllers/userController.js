@@ -49,11 +49,10 @@ async function handleLogin(req, res) {
 
     res.cookie("accessToken", token, {
       httpOnly: true,
-      // secure: process.env.NODE_ENV === "production", // Use secure cookies in production
-      sameSite: "Lax", // Adjust as needed
+      sameSite: "Lax",
       secure: false,
-      path: "/", // Ensure the cookie is accessible across your application
-      maxAge: 24 * 60 * 60 * 1000, // 1 day
+      path: "/",
+      maxAge: 24 * 60 * 60 * 1000, // 1 dia
       domain: "localhost",
     });
 
@@ -65,7 +64,7 @@ async function handleLogin(req, res) {
 
 async function handleGetCurrentUser(req, res) {
   try {
-    const user = req.user; // Assuming user is set by auth middleware
+    const user = req.user;
     if (!user) {
       return res.status(401).json({ error: "Usuário não autenticado" });
     }
@@ -91,11 +90,41 @@ async function handleLogout(req, res) {
 //   }
 // }
 
+async function handleUpdateUser(req, res) {
+  const userId = req.params.id;
+  const { name, email, phone, address, city } = req.body;
+
+  if (!name || !email) {
+    return res.status(400).json({ error: "Nome e email são obrigatórios" });
+  }
+
+  try {
+    const updatedUser = await userServices.updateUser(userId, {
+      name: name,
+      email: email.trim().toLowerCase() || null,
+      phone: phone || null,
+      address: address || null,
+      city: city || null,
+    });
+
+    return res.status(200).json({
+      message: "Usuário atualizado com sucesso",
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.error("Erro ao atualizar usuário:", error);
+    return res
+      .status(500)
+      .json({ error: "Erro interno do servidor:" + error.message });
+  }
+}
+
 module.exports = {
   userController: {
     handleRegister,
     handleLogin,
     handleLogout,
     handleGetCurrentUser,
+    handleUpdateUser,
   },
 };

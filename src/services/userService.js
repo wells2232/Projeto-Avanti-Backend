@@ -11,10 +11,11 @@ async function register(userData) {
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
+  const formattedEmail = email.trim().toLowerCase();
 
   const newUser = await userRepository.create({
     name,
-    email,
+    email: formattedEmail,
     password: hashedPassword,
   });
 
@@ -33,7 +34,8 @@ async function register(userData) {
 }
 
 async function login(email, password) {
-  const user = await userRepository.findUserByEmail(email);
+  const formattedEmail = email.trim().toLowerCase();
+  const user = await userRepository.findUserByEmail(formattedEmail);
   if (!user) {
     throw new Error("Credenciais inválidas");
   }
@@ -54,7 +56,24 @@ async function login(email, password) {
   return { token };
 }
 
+async function updateUser(id, userData) {
+  const dataForRepo = userData;
+
+  const user = await userRepository.findUserByEmail(userData.email);
+  if (user && user.id !== id) {
+    throw new Error("Este e-mail já está em uso");
+  }
+
+  if (!userData.email) {
+    dataForRepo.email = user.email.trim().toLowerCase();
+  }
+
+  const updatedUser = await userRepository.update(id, dataForRepo);
+  return updatedUser;
+}
+
 module.exports = {
   register,
   login,
+  updateUser,
 };

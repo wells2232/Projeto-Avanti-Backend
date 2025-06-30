@@ -1,12 +1,14 @@
 const prisma = require("../lib/prisma");
 
-async function findAllItems(page = 1, limit = 10) {
+async function findAllItems(where, page = 1, limit = 10) {
   const skip = (page - 1) * limit;
 
   const [items, total] = await Promise.all([
     prisma.items.findMany({
+      where,
       skip: skip,
       take: limit,
+      orderBy: { created_at: "desc" },
       select: {
         id: true,
         item_name: true,
@@ -41,7 +43,9 @@ async function findAllItems(page = 1, limit = 10) {
         },
       },
     }),
-    prisma.items.count(),
+    prisma.items.count({
+      where,
+    }),
   ]);
 
   return {

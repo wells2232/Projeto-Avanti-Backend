@@ -1,72 +1,85 @@
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+
+// prisma/seed.ts
+const { prisma } = require("@prisma/client");
+const { hash } = require("bcryptjs");
+const Role = require("@prisma/client");
+const prisma = require("../lib/prisma");
+
 
 async function main() {
   console.log("Iniciando o processo de seeding...");
 
-  // Inserindo dados na tabela 'conditions'
-  await prisma.itemConditions.createMany({
-    data: [
-      {
-        condition: "Novo",
-        description: "Item nunca usado, na embalagem original.",
-      },
-      {
-        condition: "Semi-novo",
-        description: "Item usado poucas vezes, sem marcas de uso.",
-      },
-      {
-        condition: "Usado",
-        description: "Item com marcas de uso visíveis, mas funcional.",
-      },
-    ],
-    skipDuplicates: true, // Ignora se os dados já existirem
+  // --- Criar o Usuário Administrador ---
+  const adminPassword = await hash("123456", 10); // Use uma senha segura e guarde em um .env
+  const admin = await prisma.users.upsert({
+    where: { email: "wellington@gmail.com" },
+    update: {},
+    create: {
+      email: "wellington@gmail.com",
+      name: "Wellington - ADMIN",
+      password: adminPassword,
+      role: Role.ADMIN, // Definindo o perfil como ADMIN
+    },
   });
+  console.log(`Usuário Admin criado/encontrado: ${admin.email}`);
 
-  // Inserindo dados na tabela 'statuses'
-  await prisma.itemStatuses.createMany({
-    data: [
-      {
-        status_name: "Disponível",
-        description: "O item está aberto para receber propostas.",
-      },
-      {
-        status_name: "Em negociação",
-        description: "O item tem uma proposta em andamento.",
-      },
-      { status_name: "Trocado", description: "O item já foi trocado." },
-    ],
-    skipDuplicates: true,
-  });
+  // --- Criar ItemConditions ---
+  const conditions = [
+    "Novo",
+    "Usado - Como Novo",
+    "Usado - Bom Estado",
+    "Com Defeitos",
+  ];
+  for (const condition of conditions) {
+    await prisma.itemConditions.upsert({
+      where: { condition },
+      update: {},
+      create: { condition },
+    });
+  }
+  console.log("Condições de Itens criadas.");
 
-  await prisma.proposalStatuses.createMany({
-    data: [
-      {
-        status_name: "Pendente",
-        description: "Proposta pendente de resposta.",
-      },
-      { status_name: "Aceita", description: "Proposta aceita pelo usuário." },
-      {
-        status_name: "Recusada",
-        description: "Proposta recusada pelo usuário.",
-      },
-    ],
-    skipDuplicates: true,
-  });
+  // --- Criar ItemStatuses ---
+  const itemStatuses = ["Disponível", "Reservado", "Trocado"];
+  for (const status of itemStatuses) {
+    await prisma.itemStatuses.upsert({
+      where: { status_name: status },
+      update: {},
+      create: { status_name: status },
+    });
+  }
+  console.log("Status de Itens criados.");
 
-  // Inserindo algumas categorias de exemplo
-  await prisma.category.createMany({
-    data: [
-      { category_name: "Eletrônicos" },
-      { category_name: "Livros" },
-      { category_name: "Vestuário" },
-      { category_name: "Móveis" },
-      { category_name: "Jogos" },
-    ],
-    skipDuplicates: true,
-  });
+  // --- Criar ProposalStatuses ---
+  const proposalStatuses = ["Pendente", "Aceita", "Recusada", "Cancelada"];
+  for (const status of proposalStatuses) {
+    await prisma.proposalStatuses.upsert({
+      where: { status_name: status },
+      update: {},
+      create: { status_name: status },
+    });
+  }
+  console.log("Status de Propostas criados.");
 
-  console.log("Seeding concluído com sucesso!");
+  // --- Criar Categorias Iniciais ---
+  const categories = [
+    "Eletrônicos",
+    "Móveis",
+    "Livros",
+    "Roupas",
+    "Brinquedos",
+    "Esportes",
+  ];
+  for (const category of categories) {
+    await prisma.category.upsert({
+      where: { category_name: category },
+      update: {},
+      create: { category_name: category },
+    });
+  }
+  console.log("Categorias criadas.");
+
+  console.log("Seeding finalizado com sucesso!");
 }
 
 main()

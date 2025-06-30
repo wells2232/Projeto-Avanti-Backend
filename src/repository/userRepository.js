@@ -18,8 +18,18 @@ async function create(userData) {
   });
 }
 
+async function update(id, userData) {
+  return await prisma.users.update({
+    where: {
+      id: id,
+    },
+    data: userData,
+  });
+}
+
 module.exports = {
   findAllUsers,
   findUserByEmail,
   create,
+  update,
 };
