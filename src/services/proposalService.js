@@ -197,8 +197,55 @@ async function acceptProposal(proposalId, acceptingUserId) {
   });
 }
 
+async function DeclineProposal(proposalId, DecliningUserId) {
+  const proposal = await proposalRepository.findByIdWithItems(proposalId);
+  if (!proposal) {
+    throw new Error("Proposta não encontrada.");
+  }
+
+  if (proposal.targetItem.userId !== DecliningUserId) {
+    throw new Error("Ação não permitida: você não é o dono do item alvo.");
+  }
+
+  const tradedItemStatus = await itemStatusRepository.findByName("Trocado");
+  const DeclinedProposalStatus = await proposalStatusRepository.findByName(
+    "Recusada"
+  );
+
+  if (!tradedItemStatus || !DeclinedProposalStatus) {
+    throw new Error("Status 'Trocado' ou 'Recusada' não encontrado.");
+  }
+
+  return prisma.$transaction(async (tx) => {
+    await proposalRepository.updateStatus(
+      proposalId,
+      DeclinedProposalStatus.id,
+      tx
+    );
+
+    const targetItemId = proposal.targetItemId;
+    const offeredItemIds = proposal.offeredItems.map(
+      (offered) => offered.itemId
+    );
+    const allItemsIdsToUpdate = [targetItemId, ...offeredItemIds];
+
+    const itemsToUpdate = allItemsIdsToUpdate.map((itemId) =>
+      itemService.updateStatus(itemId, tradedItemStatus.id, tx)
+    );
+
+    await Promise.all(itemsToUpdate);
+
+    return {
+      success: true,
+      updatedItems: allItemsIdsToUpdate.length,
+      proposalId,
+    };
+  });
+}
+
 module.exports = {
   acceptProposal,
+  DeclineProposal,
   createProposal,
   findUserProposals,
   findProposalsReceived,

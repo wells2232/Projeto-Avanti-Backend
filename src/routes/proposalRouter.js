@@ -46,4 +46,11 @@ proposalRouter.post(
   proposalController.handleAcceptProposal
 );
 
+proposalRouter.post(
+  "/:id/decline",
+  authenticateToken,
+  proposalController.handleDeclineProposal
+);
+
+
 module.exports = proposalRouter;
