@@ -193,12 +193,37 @@ async function handleUpdateProposal(req, res) {
   }
 }
 
+async function handleUpdateProposalStatus(req, res) {
+  try {
+    const userId = req.user.id; // quem está logado
+    const proposalId = req.params.id;
+    const { statusId } = req.body; // novo status enviado
+
+    if (!statusId) {
+      return res.status(400).json({ message: "statusId é obrigatório." });
+    }
+
+    const result = await proposalService.updateReceivedProposalStatus(
+      proposalId,
+      userId,
+      statusId
+    );
+
+    return res.status(200).json(result);
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message || "Erro ao atualizar status da proposta.",
+    });
+  }
+}
+
 
 module.exports = {
   proposalController: { handleCreateProposal, 
                         handleFindUserProposals,
                         handleReceivedUserProposals, 
                         handleDeleteProposal, 
-                        handleUpdateProposal 
+                        handleUpdateProposal,
+                        handleUpdateProposalStatus 
                       },
 };

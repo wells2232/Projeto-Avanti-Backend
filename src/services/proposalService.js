@@ -135,11 +135,50 @@ async function updateProposal(id, proposerId, updateProposal) {
   return { message: "Proposta atualizada com sucesso." };
 }
 
+async function updateReceivedProposalStatus(proposalId, userId, statusId) {
+  // Verifica se a proposta existe e se pertence ao item do usuário
+  const proposal = await prisma.proposal.findUnique({
+    where: { id: proposalId },
+    include: {
+      targetItem: true,
+    },
+  });
+
+  if (!proposal) {
+    throw new Error("Proposta não encontrada.");
+  }
+
+  if (proposal.targetItem.userId !== userId) {
+    throw new Error("Apenas o usuário que recebeu a proposta tem permissão para aceitar ou rejeitar a proposta.");
+  }
+
+  await prisma.proposal.update({
+    where: { id: proposalId },
+    data: {
+      statusId: statusId,
+    },
+  });
+
+  const status = await prisma.proposalStatuses.findUnique({
+    where: {
+      id: statusId
+    },
+    select: {
+      status_name: true
+    },
+  });
+
+  return { 
+    message: "Status da proposta atualizado com sucesso.",
+    statusName: status?.status_name || "Status não encontrado",
+   };
+}
 
 module.exports = {
   createProposal,
   findUserProposals,
   findProposalsReceived,
   deleteProposal,
-  updateProposal
+  updateProposal,
+  updateReceivedProposalStatus
 };
