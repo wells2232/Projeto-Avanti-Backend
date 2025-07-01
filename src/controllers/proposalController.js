@@ -58,8 +58,10 @@ async function handleFindUserProposals(req, res) {
     console.log("Proposals:", proposals);
     const formattedProposals = proposals.map((proposal) => ({
       id: proposal.id,
+      DestinatárioProposta: proposal.targetItem.user?.name,
       message: proposal.message,
-      proposerId: proposal.proposerId,
+      status: proposal.status.status_name,
+      createdAt: proposal.createdAt,
       targetItem: {
         id: proposal.targetItem.id,
         itemName: proposal.targetItem.item_name,
@@ -70,8 +72,6 @@ async function handleFindUserProposals(req, res) {
         itemName: item.item.item_name,
         imageUrl: item.item.image_url,
       })),
-      status: proposal.status.status_name,
-      createdAt: proposal.createdAt,
     }));
 
     res.status(200).json({
@@ -112,10 +112,8 @@ async function handleReceivedUserProposals(req, res) {
       message: proposal.message,
       proposerId: proposal.proposerId,
       proposerName: proposal.proposer?.name,
-      user: {
-        id: proposal.targetItem.user?.id,
-        name: proposal.targetItem.user?.name,
-      },
+      status: proposal.status.status_name,
+      createdAt: proposal.createdAt,
       targetItem: {
         id: proposal.targetItem.id,
         itemName: proposal.targetItem.item_name,
@@ -125,9 +123,7 @@ async function handleReceivedUserProposals(req, res) {
         id: item.item.id,
         itemName: item.item.item_name,
         imageUrl: item.item.image_url,
-      })),
-      status: proposal.status.status_name,
-      createdAt: proposal.createdAt, 
+      })), 
       }));
 
     res.status(200).json({

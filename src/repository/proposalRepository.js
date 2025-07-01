@@ -54,6 +54,12 @@ async function findUserProposals(userId, page = 1, limit = 10) {
             id: true,
             item_name: true,
             image_url: true,
+            user: {
+              select: {
+                id: true,
+                name: true,
+              },
+            }
           },
         },
         status: {
