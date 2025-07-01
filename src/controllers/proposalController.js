@@ -221,6 +221,34 @@ async function handleAcceptProposal(req, res, next) {
   }
 }
 
+async function handleDeclineProposal(req, res, next) {
+  try {
+    const { id: proposalId } = req.params;
+    const { id: DecliningUserId } = req.user;
+
+    console.log(
+      `Usuário ${DecliningUserId} está aceitando a proposta ${proposalId}`
+    );
+
+    if (!proposalId || !DecliningUserId) {
+      return res.status(400).json({
+        message: "ID da proposta ou do usuário não fornecido.",
+      });
+    }
+
+    const result = await proposalService.acceptProposal(
+      proposalId,
+      DecliningUserId
+    );
+
+    res
+      .status(200)
+      .json({ message: "Proposta aceita com sucesso.", data: result });
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   proposalController: {
     handleCreateProposal,
@@ -229,5 +257,6 @@ module.exports = {
     handleDeleteProposal,
     handleUpdateProposal,
     handleAcceptProposal,
+    handleDeleteProposal
   },
 };
