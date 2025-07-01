@@ -20,8 +20,8 @@ model Items {
   exchange_preferences String?
   created_at           DateTime @default(now())
 
-  image_url       String?
-  image_public_id String?
+  image_url       String
+  image_public_id String
 
   userId      String @db.Uuid
   statusId    String @db.Uuid

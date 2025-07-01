@@ -2,6 +2,7 @@ const { Router } = require("express");
 const { proposalController } = require("../controllers/proposalController");
 const { authenticateToken } = require("../middlewares/authMiddleware");
 const { validateProposalData } = require("../middlewares/validateProposal");
+const { proposal } = require("../lib/prisma");
 
 const proposalRouter = Router();
 
@@ -27,7 +28,11 @@ proposalRouter.get(
 );
 
 // Quando for dado o comando HTTP DELETE mais a rota '/id' é chamado o proposal controle de delete
-proposalRouter.delete("/:id", authenticateToken, proposalController.handleDeleteProposal);
+proposalRouter.delete(
+  "/:id",
+  authenticateToken,
+  proposalController.handleDeleteProposal
+);
 
 proposalRouter.put(
   "/:id",
@@ -35,6 +40,10 @@ proposalRouter.put(
   proposalController.handleUpdateProposal
 );
 
-
+proposalRouter.post(
+  "/:id/accept",
+  authenticateToken,
+  proposalController.handleAcceptProposal
+);
 
 module.exports = proposalRouter;

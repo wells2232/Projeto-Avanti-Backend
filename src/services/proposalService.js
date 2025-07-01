@@ -1,13 +1,17 @@
-const { proposal } = require("../lib/prisma");
 const prisma = require("../lib/prisma");
 const proposalRepository = require("../repository/proposalRepository");
+const itemService = require("./itemService");
+const {
+  itemStatusRepository,
+  proposalStatusRepository,
+} = require("../repository/statusRepository");
 
 async function createProposal(proposalData, offeredItemIds, proposerId) {
-  const { message, targetItemId, statusId } = proposalData;
+  const { message, targetItemId } = proposalData;
 
-  // Validar se o usuário
-  if (!proposerId) {
-    throw new Error("ID não fornecido.");
+  const defaultStatusId = await proposalStatusRepository.findByName("Pendente");
+  if (!defaultStatusId) {
+    throw new Error("Status padrão 'Pendente' não encontrado.");
   }
 
   // Validar se offeredItemIds é um array
@@ -65,11 +69,20 @@ async function createProposal(proposalData, offeredItemIds, proposerId) {
     );
   }
 
+  const reservedStatus = await itemStatusRepository.findByName("Reservado");
+
+  const itemsToUpdate = [targetItemId, ...offeredItemIds].map((itemId) =>
+    itemService.updateStatus(itemId, reservedStatus.id)
+  );
+
+  // Atualiza o status dos itens oferecidos para "Reservado"
+  await Promise.all(itemsToUpdate);
+
   const dataForRepo = {
     message,
     proposerId,
     targetItemId,
-    statusId,
+    statusId: defaultStatusId.id, // Padrão "Pendente"
   };
 
   const proposal = await proposalRepository.create(dataForRepo, offeredItemIds);
@@ -138,7 +151,54 @@ async function updateProposal(id, proposerId, updateProposal) {
   return { message: "Proposta atualizada com sucesso." };
 }
 
+async function acceptProposal(proposalId, acceptingUserId) {
+  const proposal = await proposalRepository.findByIdWithItems(proposalId);
+  if (!proposal) {
+    throw new Error("Proposta não encontrada.");
+  }
+
+  if (proposal.targetItem.userId !== acceptingUserId) {
+    throw new Error("Ação não permitida: você não é o dono do item alvo.");
+  }
+
+  const tradedItemStatus = await itemStatusRepository.findByName("Trocado");
+  const acceptedProposalStatus = await proposalStatusRepository.findByName(
+    "Aceita"
+  );
+
+  if (!tradedItemStatus || !acceptedProposalStatus) {
+    throw new Error("Status 'Trocado' ou 'Aceita' não encontrado.");
+  }
+
+  return prisma.$transaction(async (tx) => {
+    await proposalRepository.updateStatus(
+      proposalId,
+      acceptedProposalStatus.id,
+      tx
+    );
+
+    const targetItemId = proposal.targetItemId;
+    const offeredItemIds = proposal.offeredItems.map(
+      (offered) => offered.itemId
+    );
+    const allItemsIdsToUpdate = [targetItemId, ...offeredItemIds];
+
+    const itemsToUpdate = allItemsIdsToUpdate.map((itemId) =>
+      itemService.updateStatus(itemId, tradedItemStatus.id, tx)
+    );
+
+    await Promise.all(itemsToUpdate);
+
+    return {
+      success: true,
+      updatedItems: allItemsIdsToUpdate.length,
+      proposalId,
+    };
+  });
+}
+
 module.exports = {
+  acceptProposal,
   createProposal,
   findUserProposals,
   findProposalsReceived,

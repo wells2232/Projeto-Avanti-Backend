@@ -1,11 +1,12 @@
 const { categoryController } = require("../controllers/categoryController");
-const { isAdmin, authenticateToken } = require("../middlewares/authMiddleware");
+const { authenticateToken } = require("../middlewares/authMiddleware");
+const { isAdmin } = require("../middlewares/isAdminMiddleware");
 const { Router } = require("express");
 
 const categoryRouter = Router();
 
 categoryRouter.post(
-  "/",
+  "/create",
   authenticateToken,
   isAdmin,
   categoryController.handleCreateCategory

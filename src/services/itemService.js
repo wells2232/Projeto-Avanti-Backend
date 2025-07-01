@@ -1,4 +1,5 @@
 const itemRepository = require("../repository/itemRepository");
+const statusRepository = require("../repository/statusRepository");
 
 async function createItem(itemData, categoryIds, userId, imageFile) {
   const dataForRepo = {
@@ -8,6 +9,10 @@ async function createItem(itemData, categoryIds, userId, imageFile) {
     imageId: imageFile ? imageFile.filename : null,
   };
 
+  if (!dataForRepo.image_url && !dataForRepo.imageId) {
+    throw new Error("Imagem não fornecida.");
+  }
+
   // console.log("Data for repository:", dataForRepo);
 
   const item = await itemRepository.create(dataForRepo, categoryIds);
@@ -16,12 +21,23 @@ async function createItem(itemData, categoryIds, userId, imageFile) {
 
 async function updateItem(itemId, itemData, categoryIds, userId, imageFile) {
   const item = await itemRepository.findById(itemId);
-  if (!itemId) {
-    throw new Error("ID do item não fornecido.");
-  }
+
   if (!item) {
     throw new Error("Item não encontrado.");
   }
+
+  const itemStatus = await statusRepository.itemStatusRepository.findByName(
+    "Disponível"
+  );
+
+  if (itemStatus.id != item.statusId) {
+    const err = new Error(
+      "Você só pode deletar itens que estão com o status 'Disponível'."
+    );
+    err.name = "InvalidActionError";
+    throw err;
+  }
+
   if (item.userId !== userId) {
     const err = new Error("Você não tem permissão para atualizar este item.");
     err.name = "UnauthorizedError";
@@ -37,16 +53,25 @@ async function updateItem(itemId, itemData, categoryIds, userId, imageFile) {
   return await itemRepository.updateItem(itemId, dataForRepo, categoryIds);
 }
 
+async function updateStatus(itemId, statusId, tx) {
+  return await itemRepository.updateStatus(itemId, statusId, tx);
+}
+
 async function findAllItems(where, page = 1, limit = 10) {
   return await itemRepository.findAllItems(where, page, limit);
 }
 
 async function deleteItem(itemId, userId) {
-  const item = await itemRepository.findById(itemId);
-
-  if (!itemId) {
-    throw new Error("ID do item não fornecido.");
-  }
+  const item = await itemRepository.findUnique(
+    { id: itemId },
+    {
+      status: {
+        select: {
+          status_name: true,
+        },
+      },
+    }
+  );
 
   if (!item) {
     throw new Error("Item não encontrado.");
@@ -57,6 +82,15 @@ async function deleteItem(itemId, userId) {
     err.name = "UnauthorizedError";
     throw err;
   }
+
+  if (item.status.status_name !== "Disponível") {
+    const err = new Error(
+      "Você só pode deletar itens que estão com o status 'Disponível'."
+    );
+    err.name = "InvalidActionError";
+    throw err;
+  }
+
   return await itemRepository.deleteItem(itemId);
 }
 
@@ -70,4 +104,5 @@ module.exports = {
   deleteItem,
   findItemById,
   updateItem,
+  updateStatus,
 };
