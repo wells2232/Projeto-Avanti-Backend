@@ -35,13 +35,18 @@ proposalRouter.put(
   proposalController.handleUpdateProposal
 );
 
-// Rota criada para que o usuario consiga aceitar ou negar uma proposta
+// Rota criada para que o usuario consiga aceitar uma proposta
 proposalRouter.patch(
-  "/ChangeStatus/:id",
+  "/AcceptProposal/:id",
   authenticateToken,
-  proposalController.handleUpdateProposalStatus // Novo controlador
+  proposalController.handleAcceptProposalStatus // Novo controlador
 );
 
-
+// Rota criada para que o usuario consiga negar uma proposta
+proposalRouter.patch(
+  "/DeclineProposal/:id",
+  authenticateToken,
+  proposalController.handleDeclineProposalStatus // Novo controlador
+);
 
 module.exports = proposalRouter;

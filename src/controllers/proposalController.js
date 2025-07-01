@@ -189,11 +189,35 @@ async function handleUpdateProposal(req, res) {
   }
 }
 
-async function handleUpdateProposalStatus(req, res) {
+async function handleAcceptProposalStatus(req, res) {
   try {
     const userId = req.user.id; // quem está logado
     const proposalId = req.params.id;
-    const { statusId } = req.body; // novo status enviado
+    const statusId = "e7867bbf-be34-45d4-8a26-2d03fcfc66c3"; // status 'aceitado' enviado.
+
+    if (!statusId) {
+      return res.status(400).json({ message: "statusId é obrigatório." });
+    }
+
+    const result = await proposalService.updateReceivedProposalStatus(
+      proposalId,
+      userId,
+      statusId
+    );
+
+    return res.status(200).json(result);
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message || "Erro ao atualizar status da proposta.",
+    });
+  }
+}
+
+async function handleDeclineProposalStatus(req, res) {
+  try {
+    const userId = req.user.id; // quem está logado
+    const proposalId = req.params.id;
+    const statusId = "dbc40e90-d337-4b87-9e72-38bea4477271"; // status 'Recusado' enviado.
 
     if (!statusId) {
       return res.status(400).json({ message: "statusId é obrigatório." });
@@ -214,12 +238,14 @@ async function handleUpdateProposalStatus(req, res) {
 }
 
 
+
 module.exports = {
   proposalController: { handleCreateProposal, 
                         handleFindUserProposals,
                         handleReceivedUserProposals, 
                         handleDeleteProposal, 
                         handleUpdateProposal,
-                        handleUpdateProposalStatus 
+                        handleAcceptProposalStatus,
+                        handleDeclineProposalStatus
                       },
 };
