@@ -1,6 +1,6 @@
 const prisma = require("../lib/prisma");
 const proposalRepository = require("../repository/proposalRepository");
-const itemRepository = require("../repository/itemRepository");
+const itemService = require("./itemService");
 const {
   itemStatusRepository,
   proposalStatusRepository,
@@ -180,7 +180,7 @@ async function acceptProposal(proposalId, acceptingUserId) {
     const allItemsIdsToUpdate = [targetItemId, ...offeredItemIds];
 
     const itemsToUpdate = allItemsIdsToUpdate.map((itemId) =>
-      itemRepository.updateStatus(itemId, tradedItemStatus.id, tx)
+      itemService.updateStatus(itemId, tradedItemStatus.id, tx)
     );
 
     await Promise.all(itemsToUpdate);

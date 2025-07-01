@@ -1,4 +1,3 @@
-const { ca } = require("zod/v4/locales");
 const categoryService = require("../services/categoryService");
 
 async function handleCreateCategory(req, res) {
