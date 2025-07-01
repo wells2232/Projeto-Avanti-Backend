@@ -49,7 +49,7 @@ proposalRouter.post(
 proposalRouter.post(
   "/:id/decline",
   authenticateToken,
-  proposalController.handleDeleteProposal
+  proposalController.handleDeclineProposal
 );
 
 

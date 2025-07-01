@@ -215,8 +215,7 @@ async function DeclineProposal(proposalId, DecliningUserId) {
   return prisma.$transaction(async (tx) => {
     await proposalRepository.updateStatus(
       proposalId,
-      DeclinedProposalStatus,
-      ProposalStatus.id,
+      DeclinedProposalStatus.id,
       tx
     );
 
@@ -242,6 +241,7 @@ async function DeclineProposal(proposalId, DecliningUserId) {
 
 module.exports = {
   acceptProposal,
+  DeclineProposal,
   createProposal,
   findUserProposals,
   findProposalsReceived,

@@ -227,7 +227,7 @@ async function handleDeclineProposal(req, res, next) {
     const { id: DecliningUserId } = req.user;
 
     console.log(
-      `Usuário ${DecliningUserId} está aceitando a proposta ${proposalId}`
+      `Usuário ${DecliningUserId} está rejeitando a proposta ${proposalId}`
     );
 
     if (!proposalId || !DecliningUserId) {
@@ -236,14 +236,14 @@ async function handleDeclineProposal(req, res, next) {
       });
     }
 
-    const result = await proposalService.acceptProposal(
+    const result = await proposalService.DeclineProposal(
       proposalId,
       DecliningUserId
     );
 
     res
       .status(200)
-      .json({ message: "Proposta aceita com sucesso.", data: result });
+      .json({ message: "Proposta rejeitada.", data: result });
   } catch (error) {
     next(error);
   }
@@ -257,6 +257,6 @@ module.exports = {
     handleDeleteProposal,
     handleUpdateProposal,
     handleAcceptProposal,
-    handleDeleteProposal
+    handleDeclineProposal
   },
 };
