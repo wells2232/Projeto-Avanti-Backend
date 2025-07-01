@@ -14,11 +14,6 @@ async function createProposal(proposalData, offeredItemIds, proposerId) {
     throw new Error("Status padrão 'Pendente' não encontrado.");
   }
 
-  // Validar se o usuário
-  if (!proposerId) {
-    throw new Error("ID não fornecido.");
-  }
-
   // Validar se offeredItemIds é um array
   if (!Array.isArray(offeredItemIds) || offeredItemIds.length === 0) {
     throw new Error("Deve fornecer pelo menos um item para oferecer.");
@@ -73,6 +68,15 @@ async function createProposal(proposalData, offeredItemIds, proposerId) {
       "Já existe uma proposta para este item alvo por este usuário."
     );
   }
+
+  const reservedStatus = await itemStatusRepository.findByName("Reservado");
+
+  const itemsToUpdate = [targetItemId, ...offeredItemIds].map((itemId) =>
+    itemService.updateStatus(itemId, reservedStatus.id)
+  );
+
+  // Atualiza o status dos itens oferecidos para "Reservado"
+  await Promise.all(itemsToUpdate);
 
   const dataForRepo = {
     message,

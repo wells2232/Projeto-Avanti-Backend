@@ -35,9 +35,8 @@ async function handleGetAllItems(req, res) {
     const querySchema = z.object({
       page: z.string().transform(Number).optional().default(1),
       limit: z.string().transform(Number).optional().default(10),
-      user_id: z.string().uuid().optional(),
-      status_id: z.string().uuid().optional(),
-      condition_id: z.string().uuid().optional(),
+      status_name: z.string().optional(),
+      condition_name: z.string().optional(),
       category_name: z.string().optional(),
     });
 
@@ -50,13 +49,12 @@ async function handleGetAllItems(req, res) {
       });
     }
 
-    const { page, limit, user_id, status_id, condition_id, category_name } =
+    const { page, limit, status_name, condition_name, category_name } =
       parsed.data;
 
     const where = {};
-    if (user_id) where.userId = user_id;
-    if (status_id) where.status.id = status_id;
-    if (condition_id) where.condition.id = condition_id;
+    if (status_name) where.status.name = status_name;
+    if (condition_name) where.condition.name = condition_name;
     if (category_name) {
       where.categories = {
         some: {

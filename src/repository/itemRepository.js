@@ -90,9 +90,10 @@ async function deleteItem(itemId) {
   });
 }
 
-async function findById(itemId) {
+async function findUnique(where = {}, include = {}) {
   return prisma.items.findUnique({
-    where: { id: itemId },
+    where: where,
+    include: include,
   });
 }
 
@@ -140,7 +141,7 @@ module.exports = {
   create,
   findAllItems,
   deleteItem,
-  findById,
+  findUnique,
   updateItem,
   updateStatus,
 };
