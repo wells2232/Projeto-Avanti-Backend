@@ -22,6 +22,7 @@ async function register(userData) {
   const payload = {
     id: newUser.id,
     name: newUser.name,
+    role: newUser.role,
   };
 
   const token = jwt.sign(payload, process.env.JWT_SECRET, {
@@ -47,6 +48,7 @@ async function login(email, password) {
   const payload = {
     id: user.id,
     name: user.name,
+    role: user.role,
   };
 
   const token = jwt.sign(payload, process.env.JWT_SECRET, {

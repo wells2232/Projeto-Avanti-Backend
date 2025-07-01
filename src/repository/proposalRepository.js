@@ -1,6 +1,4 @@
-const { where } = require("sequelize");
 const prisma = require("../lib/prisma");
-
 
 async function create(proposalData, offeredItemIds) {
   return prisma.$transaction(async (tx) => {
@@ -157,47 +155,74 @@ async function findProposalByTargetIdAndProposerId(targetItemId, proposerId) {
 
 // função referente a remoção de alguma proposta
 async function deleteProposalById(id, proposerId) {
-
   // Cria uma transação garantindo que todos os comandos só serão executados se juntos
-  return prisma.$transaction(async(tx) => {
-
+  return prisma.$transaction(async (tx) => {
     // deleta o offeredItem dependente da proposta a ser deletada
     await tx.ProposalOfferedItems.deleteMany({
       where: {
-        proposalId : id
+        proposalId: id,
       },
     });
 
     // executa o deletemany quando o id da proposta e do proposer forem iguais a algum do banco de dados
-   const deleted = await tx.Proposal.deleteMany({
-    where:{
-      id: id,
-      proposerId: proposerId,
-    },
-   });
+    const deleted = await tx.Proposal.deleteMany({
+      where: {
+        id: id,
+        proposerId: proposerId,
+      },
+    });
 
-   return deleted;
-
+    return deleted;
   });
 }
 
-
 async function updateProposalById(id, proposerId, updateProposal) {
-  return prisma.proposal.updateMany({
-    where: {
-      id,
-      proposerId, // Garante que só o dono possa atualizar
-    },
-    data: updateProposal,
-  });
+  return prisma.proposal.updateMany({
+    where: {
+      id,
+      proposerId, // Garante que só o dono possa atualizar
+    },
+    data: updateProposal,
+  });
 }
 
+async function updateStatus(id, statusId, tx) {
+  const db = tx || prisma;
+  return db.proposal.update({
+    where: { id },
+    data: {
+      statusId,
+    },
+  });
+}
+
+async function findByIdWithItems(proposalId) {
+  return prisma.proposal.findUnique({
+    where: {
+      id: proposalId,
+    },
+    include: {
+      targetItem: {
+        select: {
+          userId: true,
+        },
+      },
+      offeredItems: {
+        select: {
+          itemId: true,
+        },
+      },
+    },
+  });
+}
 
 module.exports = {
   create,
   findUserProposals,
-  findProposalByTargetIdAndProposerId,
   findUserReceivedProposals,
-  deleteProposalById, 
-  updateProposalById
+  findProposalByTargetIdAndProposerId,
+  deleteProposalById,
+  updateProposalById,
+  updateStatus,
+  findByIdWithItems,
 };

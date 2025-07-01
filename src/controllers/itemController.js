@@ -7,7 +7,7 @@ async function handleCreateItem(req, res) {
       req.body;
 
     const userId = req.user.id;
-    const imageFile = req.file; // Arquivo de imagem enviado
+    const imageFile = req.file;
 
     const itemData = {
       name: item_name,

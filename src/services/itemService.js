@@ -8,6 +8,10 @@ async function createItem(itemData, categoryIds, userId, imageFile) {
     imageId: imageFile ? imageFile.filename : null,
   };
 
+  if (!dataForRepo.image_url && !dataForRepo.imageId) {
+    throw new Error("Imagem não fornecida.");
+  }
+
   // console.log("Data for repository:", dataForRepo);
 
   const item = await itemRepository.create(dataForRepo, categoryIds);
@@ -35,6 +39,10 @@ async function updateItem(itemId, itemData, categoryIds, userId, imageFile) {
   };
 
   return await itemRepository.updateItem(itemId, dataForRepo, categoryIds);
+}
+
+async function updateStatus(itemId, statusId, tx) {
+  return await itemRepository.updateStatus(itemId, statusId, tx);
 }
 
 async function findAllItems(where, page = 1, limit = 10) {
@@ -70,4 +78,5 @@ module.exports = {
   deleteItem,
   findItemById,
   updateItem,
+  updateStatus,
 };
