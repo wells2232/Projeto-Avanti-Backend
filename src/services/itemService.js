@@ -37,6 +37,10 @@ async function updateItem(itemId, itemData, categoryIds, userId, imageFile) {
   return await itemRepository.updateItem(itemId, dataForRepo, categoryIds);
 }
 
+async function updateStatus(itemId, statusId) {
+  return await itemRepository.updateStatus(itemId, statusId);
+}
+
 async function findAllItems(where, page = 1, limit = 10) {
   return await itemRepository.findAllItems(where, page, limit);
 }

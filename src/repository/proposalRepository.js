@@ -1,4 +1,3 @@
-const { where } = require("sequelize");
 const prisma = require("../lib/prisma");
 
 async function create(proposalData, offeredItemIds) {
@@ -187,11 +186,43 @@ async function updateProposalById(id, proposerId, updateProposal) {
   });
 }
 
+async function updateStatus(id, statusId, tx) {
+  const db = tx || prisma;
+  return db.proposal.update({
+    where: { id },
+    data: {
+      statusId,
+    },
+  });
+}
+
+async function findByIdWithItems(proposalId) {
+  return prisma.proposal.findUnique({
+    where: {
+      id: proposalId,
+    },
+    include: {
+      targetItem: {
+        select: {
+          userId: true,
+        },
+      },
+      offeredItems: {
+        select: {
+          itemId: true,
+        },
+      },
+    },
+  });
+}
+
 module.exports = {
   create,
   findUserProposals,
-  findProposalByTargetIdAndProposerId,
   findUserReceivedProposals,
+  findProposalByTargetIdAndProposerId,
   deleteProposalById,
   updateProposalById,
+  updateStatus,
+  findByIdWithItems,
 };

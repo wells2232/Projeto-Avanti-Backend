@@ -1,12 +1,18 @@
 const prisma = require("../lib/prisma");
 const proposalRepository = require("../repository/proposalRepository");
+const itemRepository = require("../repository/itemRepository");
+const {
+  itemStatusRepository,
+  proposalStatusRepository,
+} = require("../repository/statusRepository");
 
 async function createProposal(proposalData, offeredItemIds, proposerId) {
   const { message, targetItemId } = proposalData;
 
-  const defaultStatusId = await prisma.proposalStatuses.findFirst({
-    where: { status_name: "Pendente" },
-  });
+  const defaultStatusId = await proposalStatusRepository.findByName("Pendente");
+  if (!defaultStatusId) {
+    throw new Error("Status padrão 'Pendente' não encontrado.");
+  }
 
   // Validar se o usuário
   if (!proposerId) {
@@ -141,7 +147,54 @@ async function updateProposal(id, proposerId, updateProposal) {
   return { message: "Proposta atualizada com sucesso." };
 }
 
+async function acceptProposal(proposalId, acceptingUserId) {
+  const proposal = await proposalRepository.findByIdWithItems(proposalId);
+  if (!proposal) {
+    throw new Error("Proposta não encontrada.");
+  }
+
+  if (proposal.targetItem.userId !== acceptingUserId) {
+    throw new Error("Ação não permitida: você não é o dono do item alvo.");
+  }
+
+  const tradedItemStatus = await itemStatusRepository.findByName("Trocado");
+  const acceptedProposalStatus = await proposalStatusRepository.findByName(
+    "Aceita"
+  );
+
+  if (!tradedItemStatus || !acceptedProposalStatus) {
+    throw new Error("Status 'Trocado' ou 'Aceita' não encontrado.");
+  }
+
+  return prisma.$transaction(async (tx) => {
+    await proposalRepository.updateStatus(
+      proposalId,
+      acceptedProposalStatus.id,
+      tx
+    );
+
+    const targetItemId = proposal.targetItemId;
+    const offeredItemIds = proposal.offeredItems.map(
+      (offered) => offered.itemId
+    );
+    const allItemsIdsToUpdate = [targetItemId, ...offeredItemIds];
+
+    const itemsToUpdate = allItemsIdsToUpdate.map((itemId) =>
+      itemRepository.updateStatus(itemId, tradedItemStatus.id, tx)
+    );
+
+    await Promise.all(itemsToUpdate);
+
+    return {
+      success: true,
+      updatedItems: allItemsIdsToUpdate.length,
+      proposalId,
+    };
+  });
+}
+
 module.exports = {
+  acceptProposal,
   createProposal,
   findUserProposals,
   findProposalsReceived,

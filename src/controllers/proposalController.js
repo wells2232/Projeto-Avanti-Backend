@@ -16,7 +16,7 @@ async function handleCreateProposal(req, res) {
       targetItemId,
     };
 
-    console.log("Offered Items IDs:", offeredItemIds);
+    //console.log("Offered Items IDs:", offeredItemIds);
 
     // Chamar o serviço para criar a proposta
     const newProposal = await proposalService.createProposal(
@@ -44,13 +44,13 @@ async function handleFindUserProposals(req, res) {
       return res.status(401).json({ message: "Usuário não autenticado." });
     }
 
-    console.log("User ID:", userId);
+    //console.log("User ID:", userId);
 
     // Chamar o serviço para buscar as propostas do usuário
     const { proposals, total, totalPages } =
       await proposalService.findUserProposals(userId, page, limit);
 
-    console.log("Proposals:", proposals);
+    //console.log("Proposals:", proposals);
     const formattedProposals = proposals.map((proposal) => ({
       id: proposal.id,
       message: proposal.message,
@@ -94,13 +94,13 @@ async function handleReceivedUserProposals(req, res) {
       return res.status(401).json({ message: "Usuário não autenticado." });
     }
 
-    console.log("User ID:", userId);
+    //console.log("User ID:", userId);
 
     // Chamar o serviço para buscar as propostas do usuário
     const { proposals, total, totalPages } =
       await proposalService.findProposalsReceived(userId, page, limit);
 
-    console.log("Proposals:", proposals);
+    //console.log("Proposals:", proposals);
 
     const formattedProposals = proposals.map((proposal) => ({
       id: proposal.id,
@@ -193,6 +193,34 @@ async function handleUpdateProposal(req, res) {
   }
 }
 
+async function handleAcceptProposal(req, res, next) {
+  try {
+    const { id: proposalId } = req.params;
+    const { id: acceptingUserId } = req.user;
+
+    console.log(
+      `Usuário ${acceptingUserId} está aceitando a proposta ${proposalId}`
+    );
+
+    if (!proposalId || !acceptingUserId) {
+      return res.status(400).json({
+        message: "ID da proposta ou do usuário não fornecido.",
+      });
+    }
+
+    const result = await proposalService.acceptProposal(
+      proposalId,
+      acceptingUserId
+    );
+
+    res
+      .status(200)
+      .json({ message: "Proposta aceita com sucesso.", data: result });
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   proposalController: {
     handleCreateProposal,
@@ -200,5 +228,6 @@ module.exports = {
     handleReceivedUserProposals,
     handleDeleteProposal,
     handleUpdateProposal,
+    handleAcceptProposal,
   },
 };

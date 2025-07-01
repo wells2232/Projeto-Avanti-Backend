@@ -2,6 +2,11 @@ const categoryRepository = require("../repository/categoryRepository");
 
 async function createCategory(name) {
   const category = await categoryRepository.createCategory(name);
+
+  if (!category) {
+    throw new Error("Erro ao criar categoria");
+  }
+
   return category;
 }
 

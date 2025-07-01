@@ -27,19 +27,6 @@ function authenticateToken(req, res, next) {
   });
 }
 
-async function isAdmin(req, res, next) {
-  const user = req.user;
-  if (user.role && user.role === "ADMIN") {
-    return next();
-  }
-  return res.status(403).json({
-    success: false,
-    message: "Acesso negado. Você não tem permissão para acessar este recurso.",
-    errorCode: "AUTH_ACCESS_DENIED",
-  });
-}
-
 module.exports = {
   authenticateToken,
-  isAdmin,
 };

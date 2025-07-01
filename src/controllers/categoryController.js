@@ -1,13 +1,16 @@
+const { ca } = require("zod/v4/locales");
 const categoryService = require("../services/categoryService");
 
 async function handleCreateCategory(req, res) {
-  const { name } = req.body;
+  const { categoryName } = req.body;
   try {
-    const category = await categoryService.createCategory(name);
-    res.status(201).json(category);
+    const { category_name } = await categoryService.createCategory(
+      categoryName
+    );
+    res.status(201).json({ category_name });
   } catch (error) {
     console.error("Error creating category:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ error: error.message || "Internal Server Error" });
   }
 }
 
