@@ -23,7 +23,6 @@ async function handleRegister(req, res) {
       secure: false,
       path: "/",
       maxAge: 24 * 60 * 60 * 1000, // 1 day
-      domain: "localhost",
     });
 
     return res
@@ -49,11 +48,10 @@ async function handleLogin(req, res) {
 
     res.cookie("accessToken", token, {
       httpOnly: true,
-      sameSite: "Lax",
+      sameSite: "lax",
       secure: false,
       path: "/",
       maxAge: 24 * 60 * 60 * 1000, // 1 dia
-      domain: "localhost",
     });
 
     return res.status(200).json({ message: "Login realizado com sucesso" });

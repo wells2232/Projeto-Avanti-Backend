@@ -3,25 +3,28 @@ const z = require("zod");
 
 async function handleCreateItem(req, res) {
   try {
-    const { item_name, description, conditionId, statusId, categoryIds } =
-      req.body;
+    const {
+      item_name,
+      description,
+      conditionId,
+      statusId,
+      categoryIds,
+      imageUrl,
+      publicId,
+    } = req.body;
 
     const userId = req.user.id;
-    const imageFile = req.file;
 
     const itemData = {
       name: item_name,
       description: description,
       conditionId: conditionId,
       statusId: statusId,
+      imageUrl: imageUrl,
+      publicId: publicId,
     };
 
-    const newItem = await itemService.createItem(
-      itemData,
-      categoryIds,
-      userId,
-      imageFile
-    );
+    const newItem = await itemService.createItem(itemData, categoryIds, userId);
     res.status(201).json(newItem);
   } catch (error) {
     return res

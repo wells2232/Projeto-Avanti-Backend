@@ -1,17 +1,20 @@
 const itemRepository = require("../repository/itemRepository");
 const statusRepository = require("../repository/statusRepository");
 
-async function createItem(itemData, categoryIds, userId, imageFile) {
-  const dataForRepo = {
-    ...itemData,
-    userId: userId,
-    image_url: imageFile ? imageFile.path : null,
-    imageId: imageFile ? imageFile.filename : null,
-  };
-
-  if (!dataForRepo.image_url && !dataForRepo.imageId) {
-    throw new Error("Imagem não fornecida.");
+async function createItem(itemData, categoryIds, userId) {
+  if (!itemData.imageUrl || !itemData.publicId) {
+    throw new Error("Nome e descrição do item são obrigatórios.");
   }
+
+  const dataForRepo = {
+    name: itemData.name,
+    description: itemData.description,
+    conditionId: itemData.conditionId,
+    statusId: itemData.statusId,
+    userId: userId,
+    image_url: itemData.imageUrl,
+    image_public_id: itemData.publicId,
+  };
 
   // console.log("Data for repository:", dataForRepo);
 
