@@ -1,6 +1,8 @@
+require("dotenv").config();
 const express = require("express");
 const userRouter = require("./routes/userRouter");
 const itemRouter = require("./routes/itemRouter");
+const authRouter = require("./routes/authRouter");
 const proposalRouter = require("./routes/proposalRouter");
 const categoryRouter = require("./routes/categoryRouter");
 const {
@@ -25,6 +27,8 @@ app.use(cookieParser());
 app.use(express.json());
 
 app.use("/api", userRouter);
+
+app.use("/api/auth", authRouter);
 
 app.use("/api/items", itemRouter);
 

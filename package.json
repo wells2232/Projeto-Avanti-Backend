@@ -17,18 +17,22 @@
     "@prisma/client": "^6.10.1",
     "bad-words": "^3.0.4",
     "bcryptjs": "^3.0.2",
+    "bullmq": "^5.56.0",
     "cloudinary": "^1.41.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
+    "crypto": "^1.0.1",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.1",
     "multer-storage-cloudinary": "^4.0.0",
+    "nodemailer": "^7.0.4",
     "prisma": "^6.10.1",
     "sequelize": "^6.37.7",
     "zod": "^3.25.67"
   },
   "devDependencies": {
+    "dotenv": "^17.0.1",
     "nodemon": "^3.1.10"
   }
 }

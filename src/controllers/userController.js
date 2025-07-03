@@ -1,4 +1,4 @@
-const userServices = require("../services/userService");
+const userService = require("../services/userService");
 
 async function handleRegister(req, res) {
   try {
@@ -10,7 +10,7 @@ async function handleRegister(req, res) {
         .json({ error: "Todos os campos são obrigatórios" });
     }
 
-    const { newUser, token } = await userServices.register({
+    const { newUser, token } = await userService.register({
       name,
       email,
       password,
@@ -45,7 +45,7 @@ async function handleLogin(req, res) {
       return res.status(400).json({ error: "Email e senha são obrigatórios" });
     }
 
-    const { token } = await userServices.login(email, password);
+    const { token } = await userService.login(email, password);
 
     res.cookie("accessToken", token, {
       httpOnly: true,
@@ -99,7 +99,7 @@ async function handleUpdateUser(req, res) {
   }
 
   try {
-    const updatedUser = await userServices.updateUser(userId, {
+    const updatedUser = await userService.updateUser(userId, {
       name: name,
       email: email.trim().toLowerCase() || null,
       phone: phone || null,

@@ -1,6 +1,8 @@
 const bcrypt = require("bcryptjs");
 const userRepository = require("../repository/userRepository");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
+const { emailQueue } = require("../config/queue");
 
 async function register(userData) {
   const { name, email, password } = userData;
@@ -13,11 +15,29 @@ async function register(userData) {
   const hashedPassword = await bcrypt.hash(password, 10);
   const formattedEmail = email.trim().toLowerCase();
 
+  const verificationToken = crypto.randomBytes(32).toString("hex");
+
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(verificationToken)
+    .digest("hex");
+
+  const tokenExpiration = new Date(Date.now() + 3600000); // 1 hora
+
   const newUser = await userRepository.create({
     name,
     email: formattedEmail,
     password: hashedPassword,
+    emailVerificationToken: hashedToken,
+    emailVerificationTokenExpiresAt: tokenExpiration,
   });
+
+  await emailQueue.add("send-verification-email", {
+    userEmail: newUser.email,
+    verificationToken: verificationToken,
+  });
+
+  console.log(`Job para enviar e-mail para ${newUser.email} adicionado à fila`);
 
   const payload = {
     id: newUser.id,
@@ -29,7 +49,11 @@ async function register(userData) {
     expiresIn: "2h",
   });
 
-  const { password: _, ...userWithoutPassword } = newUser;
+  const {
+    password: _,
+    emailVerificationToken,
+    ...userWithoutPassword
+  } = newUser;
 
   return { user: userWithoutPassword, token };
 }

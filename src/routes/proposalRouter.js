@@ -37,6 +37,7 @@ proposalRouter.delete(
 proposalRouter.put(
   "/:id",
   authenticateToken,
+  validateProposalData,
   proposalController.handleUpdateProposal
 );
 
@@ -51,6 +52,5 @@ proposalRouter.post(
   authenticateToken,
   proposalController.handleDeclineProposal
 );
-
 
 module.exports = proposalRouter;
