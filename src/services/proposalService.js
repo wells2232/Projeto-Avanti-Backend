@@ -1,10 +1,12 @@
 const prisma = require("../lib/prisma");
 const proposalRepository = require("../repository/proposalRepository");
+const itemRepository = require("../repository/itemRepository");
 const itemService = require("./itemService");
 const {
   itemStatusRepository,
   proposalStatusRepository,
 } = require("../repository/statusRepository");
+const { emailQueue } = require("../config/queue");
 
 async function createProposal(proposalData, offeredItemIds, proposerId) {
   const { message, targetItemId } = proposalData;
@@ -25,10 +27,6 @@ async function createProposal(proposalData, offeredItemIds, proposerId) {
 
   if (!message || message.trim() === "") {
     throw new Error("Mensagem não fornecida.");
-  }
-
-  if (!Array.isArray(offeredItemIds) || offeredItemIds.length === 0) {
-    throw new Error("Deve fornecer pelo menos um item para oferecer.");
   }
 
   // Verifica se todos os itens oferecidos pertencem ao usuario logado
@@ -170,34 +168,60 @@ async function acceptProposal(proposalId, acceptingUserId) {
     throw new Error("Status 'Trocado' ou 'Aceita' não encontrado.");
   }
 
-  return prisma.$transaction(async (tx) => {
+  const transactionResult = await prisma.$transaction(async (tx) => {
     await proposalRepository.updateStatus(
       proposalId,
       acceptedProposalStatus.id,
       tx
     );
 
-    const targetItemId = proposal.targetItemId;
     const offeredItemIds = proposal.offeredItems.map(
       (offered) => offered.itemId
     );
-    const allItemsIdsToUpdate = [targetItemId, ...offeredItemIds];
+    const allItemsIdsToUpdate = [proposal.targetItemId, ...offeredItemIds];
 
-    const itemsToUpdate = allItemsIdsToUpdate.map((itemId) =>
+    await tx.items.updateMany({
+      where: { id: { in: allItemsIdsToUpdate } },
+      data: { statusId: tradedItemStatus.id },
+    });
+
+    const proposerData = await tx.users.findUnique({
+      where: { id: proposal.proposerId },
+      select: { email: true, name: true },
+    });
+
+    const targetItem = await tx.items.findUnique({
+      where: { id: proposal.targetItemId },
+      select: { item_name: true },
+    });
+
+    /*const itemsToUpdate = allItemsIdsToUpdate.map((itemId) =>
       itemService.updateStatus(itemId, tradedItemStatus.id, tx)
-    );
+    );*/
 
-    await Promise.all(itemsToUpdate);
+    //await Promise.all(itemsToUpdate);
 
-    return {
-      success: true,
-      updatedItems: allItemsIdsToUpdate.length,
-      proposalId,
-    };
+    return { proposerData, targetItem, allItemsIdsToUpdate };
   });
+
+  if (transactionResult) {
+    await emailQueue.add("sendProposalAcceptedEmail", {
+      userEmail: transactionResult.proposerData.email,
+      proposalDetails: {
+        itemName: transactionResult.targetItem.item_name,
+        itemOwnerName: transactionResult.proposerData.name,
+      },
+    });
+  }
+
+  return {
+    success: true,
+    updatedItems: transactionResult.allItemsIdsToUpdate.length,
+    proposalId,
+  };
 }
 
-async function DeclineProposal(proposalId, DecliningUserId) {
+async function declineProposal(proposalId, DecliningUserId) {
   const proposal = await proposalRepository.findByIdWithItems(proposalId);
   if (!proposal) {
     throw new Error("Proposta não encontrada.");
@@ -207,13 +231,15 @@ async function DeclineProposal(proposalId, DecliningUserId) {
     throw new Error("Ação não permitida: você não é o dono do item alvo.");
   }
 
-  const tradedItemStatus = await itemStatusRepository.findByName("Trocado");
+  const avaliableItemStatus = await itemStatusRepository.findByName(
+    "Disponível"
+  );
   const DeclinedProposalStatus = await proposalStatusRepository.findByName(
     "Recusada"
   );
 
-  if (!tradedItemStatus || !DeclinedProposalStatus) {
-    throw new Error("Status 'Trocado' ou 'Recusada' não encontrado.");
+  if (!avaliableItemStatus || !DeclinedProposalStatus) {
+    throw new Error("Status 'Disponível' ou 'Recusada' não encontrado.");
   }
 
   return prisma.$transaction(async (tx) => {
@@ -245,7 +271,7 @@ async function DeclineProposal(proposalId, DecliningUserId) {
 
 module.exports = {
   acceptProposal,
-  DeclineProposal,
+  declineProposal,
   createProposal,
   findUserProposals,
   findProposalsReceived,

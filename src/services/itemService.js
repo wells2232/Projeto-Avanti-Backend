@@ -3,7 +3,7 @@ const statusRepository = require("../repository/statusRepository");
 
 async function createItem(itemData, categoryIds, userId) {
   if (!itemData.imageUrl || !itemData.publicId) {
-    throw new Error("Nome e descrição do item são obrigatórios.");
+    throw new Error("Imagem e Imagem ID do item são obrigatórios.");
   }
 
   const dataForRepo = {
@@ -35,7 +35,7 @@ async function updateItem(itemId, itemData, categoryIds, userId, imageFile) {
 
   if (itemStatus.id != item.statusId) {
     const err = new Error(
-      "Você só pode deletar itens que estão com o status 'Disponível'."
+      "Você só pode atualizar itens que estão com o status 'Disponível'."
     );
     err.name = "InvalidActionError";
     throw err;
@@ -46,6 +46,7 @@ async function updateItem(itemId, itemData, categoryIds, userId, imageFile) {
     err.name = "UnauthorizedError";
     throw err;
   }
+
   const dataForRepo = {
     ...itemData,
     userId: userId,
