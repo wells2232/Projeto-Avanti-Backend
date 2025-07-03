@@ -27,6 +27,15 @@ const worker = new Worker(
         console.log("Enviando email de redefinição de senha...");
         return;
       }
+      case "sendProposalAcceptedEmail": {
+        const { userEmail, proposalDetails } = job.data;
+        await emailService.sendAcceptedProposalEmail(
+          userEmail,
+          proposalDetails
+        );
+        console.log("Enviando email de proposta aceita...");
+        return;
+      }
       default:
         throw new Error(`Job desconhecido: ${job.name}`);
     }

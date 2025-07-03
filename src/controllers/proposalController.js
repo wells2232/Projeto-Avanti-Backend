@@ -236,14 +236,12 @@ async function handleDeclineProposal(req, res, next) {
       });
     }
 
-    const result = await proposalService.DeclineProposal(
+    const result = await proposalService.declineProposal(
       proposalId,
       DecliningUserId
     );
 
-    res
-      .status(200)
-      .json({ message: "Proposta rejeitada.", data: result });
+    res.status(200).json({ message: "Proposta rejeitada.", data: result });
   } catch (error) {
     next(error);
   }
@@ -257,6 +255,6 @@ module.exports = {
     handleDeleteProposal,
     handleUpdateProposal,
     handleAcceptProposal,
-    handleDeclineProposal
+    handleDeclineProposal,
   },
 };

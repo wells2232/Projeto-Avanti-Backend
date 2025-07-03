@@ -38,9 +38,23 @@ async function sendPasswordResetEmail(userEmail, userName, resetToken) {
   console.log(`Email de redefinição de senha enviado para ${userEmail}`);
 }
 
+async function sendAcceptedProposalEmail(userEmail, proposalDetails) {
+  const mailOptions = {
+    from: `"App Name" <${process.env.EMAIL_USER}>`,
+    to: userEmail,
+    subject: "Proposta Aceita",
+    html: `<p>Boas Notícias! Sua proposta para o item ${proposalDetails.itemName} foi aceita.
+    Entre em contato com ${proposalDetails.itemOwnerName} para combinar a troca</p>`,
+  };
+
+  await transporter.sendMail(mailOptions);
+  console.log(`Email de proposta aceita enviado para ${userEmail}`);
+}
+
 module.exports = {
   emailService: {
     sendVerificationEmail,
     sendPasswordResetEmail,
+    sendAcceptedProposalEmail,
   },
 };
