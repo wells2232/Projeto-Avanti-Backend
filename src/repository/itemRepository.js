@@ -64,7 +64,7 @@ async function create(itemData, categoryIds) {
         item_name: itemData.name,
         description: itemData.description,
         image_url: itemData.image_url,
-        image_public_id: itemData.imageId,
+        image_public_id: itemData.image_public_id,
         userId: itemData.userId,
         conditionId: itemData.conditionId,
         statusId: itemData.statusId,

@@ -1,6 +1,9 @@
 const bcrypt = require("bcryptjs");
 const userRepository = require("../repository/userRepository");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
+const { emailQueue } = require("../config/queue");
+const prisma = require("../lib/prisma");
 
 async function register(userData) {
   const { name, email, password } = userData;
@@ -13,11 +16,29 @@ async function register(userData) {
   const hashedPassword = await bcrypt.hash(password, 10);
   const formattedEmail = email.trim().toLowerCase();
 
+  const verificationToken = crypto.randomBytes(32).toString("hex");
+
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(verificationToken)
+    .digest("hex");
+
+  const tokenExpiration = new Date(Date.now() + 3600000); // 1 hora
+
   const newUser = await userRepository.create({
     name,
     email: formattedEmail,
     password: hashedPassword,
+    emailVerificationToken: hashedToken,
+    emailVerificationTokenExpiresAt: tokenExpiration,
   });
+
+  await emailQueue.add("send-verification-email", {
+    userEmail: newUser.email,
+    verificationToken: verificationToken,
+  });
+
+  console.log(`Job para enviar e-mail para ${newUser.email} adicionado à fila`);
 
   const payload = {
     id: newUser.id,
@@ -29,7 +50,11 @@ async function register(userData) {
     expiresIn: "2h",
   });
 
-  const { password: _, ...userWithoutPassword } = newUser;
+  const {
+    password: _,
+    emailVerificationToken,
+    ...userWithoutPassword
+  } = newUser;
 
   return { user: userWithoutPassword, token };
 }
@@ -74,8 +99,37 @@ async function updateUser(id, userData) {
   return updatedUser;
 }
 
+async function changePassword(userId, currentPassword, newPassword) {
+  if (newPassword.length < 6) {
+    throw new Error("A nova senha deve ter pelo menos 6 caracteres");
+  }
+
+  const user = await prisma.users.findUnique({
+    where: { id: userId },
+  });
+  if (!user) {
+    throw new Error("Usuário não encontrado");
+  }
+
+  const isCurrentPasswordValid = await bcrypt.compare(
+    currentPassword,
+    user.password
+  );
+  if (!isCurrentPasswordValid) {
+    throw new Error("Senha atual inválida");
+  }
+
+  const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+  const updatedUser = await userRepository.update(userId, {
+    password: hashedNewPassword,
+  });
+
+  return updatedUser;
+}
+
 module.exports = {
   register,
   login,
+  changePassword,
   updateUser,
 };

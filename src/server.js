@@ -1,8 +1,11 @@
+require("dotenv").config();
 const express = require("express");
 const userRouter = require("./routes/userRouter");
 const itemRouter = require("./routes/itemRouter");
+const authRouter = require("./routes/authRouter");
 const proposalRouter = require("./routes/proposalRouter");
 const categoryRouter = require("./routes/categoryRouter");
+const uploadRouter = require("./routes/uploadRouter");
 const {
   itemStatusRouter,
   proposalStatusRouter,
@@ -13,9 +16,8 @@ const cookieParser = require("cookie-parser");
 const app = express();
 
 const corsOptions = {
-  // Frontend URL
-  origin: "http://localhost:5173",
-  credentials: true,
+  origin: "http://localhost:5500",
+  credentials: true, // Allow cookies to be sent with requests
 };
 
 app.use(cors(corsOptions));
@@ -25,6 +27,10 @@ app.use(cookieParser());
 app.use(express.json());
 
 app.use("/api", userRouter);
+
+app.use("/api/auth", authRouter);
+
+app.use("/api/upload", uploadRouter);
 
 app.use("/api/items", itemRouter);
 

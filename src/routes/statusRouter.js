@@ -2,7 +2,7 @@ const {
   itemStatusController,
   proposalStatusController,
 } = require("../controllers/statusController");
-const { authenticateToken } = require("../middlewares/authMiddleware");
+const { isAuthenticated } = require("../middlewares/authMiddleware");
 const { isAdmin } = require("../middlewares/isAdminMiddleware");
 const { Router } = require("express");
 
@@ -12,7 +12,7 @@ const proposalStatusRouter = Router();
 /// Item Status Routes ///
 itemStatusRouter.post(
   "/",
-  authenticateToken,
+  isAuthenticated,
   isAdmin,
   itemStatusController.handleCreateItemStatus
 );
@@ -21,7 +21,7 @@ itemStatusRouter.get("/", itemStatusController.handleGetAllItemStatuses);
 
 itemStatusRouter.delete(
   "/:id",
-  authenticateToken,
+  isAuthenticated,
   isAdmin,
   itemStatusController.handleDeleteItemStatus
 );
@@ -29,7 +29,7 @@ itemStatusRouter.delete(
 /// Proposal Status Routes ///
 proposalStatusRouter.post(
   "/",
-  authenticateToken,
+  isAuthenticated,
   isAdmin,
   proposalStatusController.handleCreateProposalStatus
 );
@@ -41,7 +41,7 @@ proposalStatusRouter.get(
 
 proposalStatusRouter.delete(
   "/:id",
-  authenticateToken,
+  isAuthenticated,
   isAdmin,
   proposalStatusController.handleDeleteProposalStatus
 );

@@ -1,5 +1,5 @@
 const { Router } = require("express");
-const { authenticateToken } = require("../middlewares/authMiddleware");
+const { isAuthenticated } = require("../middlewares/authMiddleware");
 const { itemController } = require("../controllers/itemController");
 const upload = require("../config/multerConfig.js");
 const { validateCategoryData } = require("../middlewares/validateItem.js");
@@ -17,9 +17,7 @@ const itemRouter = Router();
 // Criar item
 itemRouter.post(
   "/",
-  authenticateToken,
-  upload.single("itemImage"),
-  logRequestState,
+  isAuthenticated,
   validateCategoryData,
   itemController.handleCreateItem
 );
@@ -31,12 +29,12 @@ itemRouter.get("/", itemController.handleGetAllItems);
 itemRouter.get("/:id", itemController.handleGetItemById);
 
 // Deletar Item
-itemRouter.delete("/:id", authenticateToken, itemController.handleDeleteItem);
+itemRouter.delete("/:id", isAuthenticated, itemController.handleDeleteItem);
 
 // Editar Item
 itemRouter.put(
   "/:id",
-  authenticateToken,
+  isAuthenticated,
   upload.single("itemImage"),
   logRequestState,
   itemController.handleUpdateItem

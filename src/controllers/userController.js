@@ -1,4 +1,4 @@
-const userServices = require("../services/userService");
+const userService = require("../services/userService");
 
 async function handleRegister(req, res) {
   try {
@@ -10,7 +10,7 @@ async function handleRegister(req, res) {
         .json({ error: "Todos os campos são obrigatórios" });
     }
 
-    const { newUser, token } = await userServices.register({
+    const { newUser, token } = await userService.register({
       name,
       email,
       password,
@@ -23,7 +23,6 @@ async function handleRegister(req, res) {
       secure: false,
       path: "/",
       maxAge: 24 * 60 * 60 * 1000, // 1 day
-      domain: "localhost",
     });
 
     return res
@@ -45,15 +44,14 @@ async function handleLogin(req, res) {
       return res.status(400).json({ error: "Email e senha são obrigatórios" });
     }
 
-    const { token } = await userServices.login(email, password);
+    const { token } = await userService.login(email, password);
 
     res.cookie("accessToken", token, {
       httpOnly: true,
-      sameSite: "Lax",
+      sameSite: "lax",
       secure: false,
       path: "/",
       maxAge: 24 * 60 * 60 * 1000, // 1 dia
-      domain: "localhost",
     });
 
     return res.status(200).json({ message: "Login realizado com sucesso" });
@@ -99,7 +97,7 @@ async function handleUpdateUser(req, res) {
   }
 
   try {
-    const updatedUser = await userServices.updateUser(userId, {
+    const updatedUser = await userService.updateUser(userId, {
       name: name,
       email: email.trim().toLowerCase() || null,
       phone: phone || null,
@@ -119,6 +117,25 @@ async function handleUpdateUser(req, res) {
   }
 }
 
+async function handleChangePassword(req, res) {
+  const userId = req.user.id;
+  const { currentPassword, newPassword } = req.body;
+
+  if (!currentPassword || !newPassword) {
+    return res
+      .status(400)
+      .json({ error: "Senha atual e nova senha são obrigatórias" });
+  }
+
+  try {
+    await userService.changePassword(userId, currentPassword, newPassword);
+    return res.status(200).json({ message: "Senha alterada com sucesso" });
+  } catch (error) {
+    console.error("Erro ao alterar senha:", error);
+    return res.status(500).json({ error: "Erro interno do servidor" });
+  }
+}
+
 module.exports = {
   userController: {
     handleRegister,
@@ -126,5 +143,6 @@ module.exports = {
     handleLogout,
     handleGetCurrentUser,
     handleUpdateUser,
+    handleChangePassword,
   },
 };

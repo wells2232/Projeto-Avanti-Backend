@@ -85,6 +85,13 @@ model Users {
 
   role Role @default(USER)
 
+  isEmailVerified                 Boolean   @default(false)
+  emailVerificationToken          String?   @unique
+  emailVerificationTokenExpiresAt DateTime?
+
+  passwordResetToken          String?   @unique
+  passwordResetTokenExpiresAt DateTime?
+
   Items    Items[]
   Proposal Proposal[]
 }
