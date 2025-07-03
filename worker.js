@@ -9,21 +9,29 @@ const worker = new Worker(
   "email-queue",
   async (job) => {
     console.log(`Processando job #${job.id} - ${job.name}`);
-    const { userEmail, verificationToken } = job.data;
 
-    try {
-      await emailService.sendVerificationEmail(userEmail, verificationToken);
-      console.log(
-        `Job ${job.id} concluído com sucesso: Email enviado para ${userEmail}`
-      );
-    } catch (error) {
-      console.error(`Job ${job.id} falhou`, error);
-      throw error;
+    switch (job.name) {
+      case "send-verification-email": {
+        const { userEmail, verificationToken } = job.data;
+        await emailService.sendVerificationEmail(userEmail, verificationToken);
+        console.log("Enviando email de verificação...");
+        return;
+      }
+      case "password-reset": {
+        const { userEmail, userName, resetToken } = job.data;
+        await emailService.sendPasswordResetEmail(
+          userEmail,
+          userName,
+          resetToken
+        );
+        console.log("Enviando email de redefinição de senha...");
+        return;
+      }
+      default:
+        throw new Error(`Job desconhecido: ${job.name}`);
     }
   },
-  {
-    connection: redisConnection,
-  }
+  { connection: redisConnection }
 );
 
 worker.on("completed", (job) => {

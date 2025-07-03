@@ -24,8 +24,23 @@ async function sendVerificationEmail(userEmail, verificationToken) {
   console.log(`Email de verificação enviado para ${userEmail}`);
 }
 
+async function sendPasswordResetEmail(userEmail, userName, resetToken) {
+  const resetUrl = `http://localhost:3000/reset-password?token=${resetToken}`;
+
+  const mailOptions = {
+    from: `"App Name" <${process.env.EMAIL_USER}>`,
+    to: userEmail,
+    subject: "Redefinição de Senha",
+    html: `<p>Olá, ${userName}! Clique <a href="${resetUrl}">aqui</a> para redefinir sua senha.</p>`,
+  };
+
+  await transporter.sendMail(mailOptions);
+  console.log(`Email de redefinição de senha enviado para ${userEmail}`);
+}
+
 module.exports = {
   emailService: {
     sendVerificationEmail,
+    sendPasswordResetEmail,
   },
 };

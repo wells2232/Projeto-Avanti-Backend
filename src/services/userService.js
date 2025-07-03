@@ -3,6 +3,7 @@ const userRepository = require("../repository/userRepository");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const { emailQueue } = require("../config/queue");
+const prisma = require("../lib/prisma");
 
 async function register(userData) {
   const { name, email, password } = userData;
@@ -98,8 +99,37 @@ async function updateUser(id, userData) {
   return updatedUser;
 }
 
+async function changePassword(userId, currentPassword, newPassword) {
+  if (newPassword.length < 6) {
+    throw new Error("A nova senha deve ter pelo menos 6 caracteres");
+  }
+
+  const user = await prisma.users.findUnique({
+    where: { id: userId },
+  });
+  if (!user) {
+    throw new Error("Usuário não encontrado");
+  }
+
+  const isCurrentPasswordValid = await bcrypt.compare(
+    currentPassword,
+    user.password
+  );
+  if (!isCurrentPasswordValid) {
+    throw new Error("Senha atual inválida");
+  }
+
+  const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+  const updatedUser = await userRepository.update(userId, {
+    password: hashedNewPassword,
+  });
+
+  return updatedUser;
+}
+
 module.exports = {
   register,
   login,
+  changePassword,
   updateUser,
 };

@@ -27,4 +27,10 @@ userRouter.patch(
   userController.handleUpdateUser
 );
 
+userRouter.patch(
+  "/me/change-password",
+  authenticateToken,
+  userController.handleChangePassword
+);
+
 module.exports = userRouter;

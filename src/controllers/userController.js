@@ -119,6 +119,25 @@ async function handleUpdateUser(req, res) {
   }
 }
 
+async function handleChangePassword(req, res) {
+  const userId = req.user.id;
+  const { currentPassword, newPassword } = req.body;
+
+  if (!currentPassword || !newPassword) {
+    return res
+      .status(400)
+      .json({ error: "Senha atual e nova senha são obrigatórias" });
+  }
+
+  try {
+    await userService.changePassword(userId, currentPassword, newPassword);
+    return res.status(200).json({ message: "Senha alterada com sucesso" });
+  } catch (error) {
+    console.error("Erro ao alterar senha:", error);
+    return res.status(500).json({ error: "Erro interno do servidor" });
+  }
+}
+
 module.exports = {
   userController: {
     handleRegister,
@@ -126,5 +145,6 @@ module.exports = {
     handleLogout,
     handleGetCurrentUser,
     handleUpdateUser,
+    handleChangePassword,
   },
 };
