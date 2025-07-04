@@ -1,14 +1,12 @@
 const { Router } = require("express");
-const { userController } = require("../controllers/userController");
+const userController = require("../controllers/userController");
 const { validateRegister } = require("../middlewares/validadeRegister");
 const { isAuthenticated } = require("../middlewares/authMiddleware");
 
 const userRouter = Router();
 
-userRouter.post(
-  "/auth/register",
-  validateRegister,
-  userController.handleRegister
+userRouter.post("/auth/register", validateRegister, (req, res, next) =>
+  userController.handleRegister(req, res, next)
 );
 
 userRouter.post("/auth/login", userController.handleLogin);

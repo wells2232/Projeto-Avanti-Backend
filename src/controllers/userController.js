@@ -137,12 +137,10 @@ async function handleChangePassword(req, res) {
 }
 
 module.exports = {
-  userController: {
-    handleRegister,
-    handleLogin,
-    handleLogout,
-    handleGetCurrentUser,
-    handleUpdateUser,
-    handleChangePassword,
-  },
+  handleRegister,
+  handleLogin,
+  handleLogout,
+  handleGetCurrentUser,
+  handleUpdateUser,
+  handleChangePassword,
 };

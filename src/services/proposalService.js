@@ -8,6 +8,17 @@ const {
 } = require("../repository/statusRepository");
 const { emailQueue } = require("../config/queue");
 
+/**
+ * @typedef {Object} ProposalService
+ * @property {Function} createProposal - Cria uma nova proposta.
+ * @property {Function} findUserProposals - Encontra propostas feitas pelo usuário.
+ * @property {Function} findProposalsReceived - Encontra propostas recebidas pelo usuário.
+ * @property {Function} deleteProposal - Deleta uma proposta.
+ * @property {Function} updateProposal - Atualiza uma proposta.
+ * @property {Function} acceptProposal - Aceita uma proposta.
+ * @property {Function} declineProposal - Recusa uma proposta.
+ */
+
 async function createProposal(proposalData, offeredItemIds, proposerId) {
   const { message, targetItemId } = proposalData;
 
@@ -38,7 +49,9 @@ async function createProposal(proposalData, offeredItemIds, proposerId) {
   });
 
   if (offeredItems.length !== offeredItemIds.length) {
-    throw new Error("Todos os itens devem pertencer ao usuario logado.");
+    throw new Error(
+      "Nem todos os itens oferecidos pertencem ao usuário logado."
+    );
   }
 
   const targetItem = await prisma.items.findUnique({
@@ -195,12 +208,6 @@ async function acceptProposal(proposalId, acceptingUserId) {
       select: { item_name: true },
     });
 
-    /*const itemsToUpdate = allItemsIdsToUpdate.map((itemId) =>
-      itemService.updateStatus(itemId, tradedItemStatus.id, tx)
-    );*/
-
-    //await Promise.all(itemsToUpdate);
-
     return { proposerData, targetItem, allItemsIdsToUpdate };
   });
 
@@ -227,7 +234,7 @@ async function declineProposal(proposalId, DecliningUserId) {
     throw new Error("Proposta não encontrada.");
   }
 
-  if (proposal.targetItem.userId !== DecliningUserId) {
+  if (proposal.targetItem.userId !== acceptingUserId) {
     throw new Error("Ação não permitida: você não é o dono do item alvo.");
   }
 
@@ -242,7 +249,7 @@ async function declineProposal(proposalId, DecliningUserId) {
     throw new Error("Status 'Disponível' ou 'Recusada' não encontrado.");
   }
 
-  return prisma.$transaction(async (tx) => {
+  const transactionResult = await prisma.$transaction(async (tx) => {
     await proposalRepository.updateStatus(
       proposalId,
       DeclinedProposalStatus.id,
@@ -255,18 +262,38 @@ async function declineProposal(proposalId, DecliningUserId) {
     );
     const allItemsIdsToUpdate = [targetItemId, ...offeredItemIds];
 
-    const itemsToUpdate = allItemsIdsToUpdate.map((itemId) =>
-      itemService.updateStatus(itemId, tradedItemStatus.id, tx)
-    );
+    await tx.items.updateMany({
+      where: { id: { in: allItemsIdsToUpdate } },
+      data: { statusId: avaliableItemStatus.id },
+    });
 
-    await Promise.all(itemsToUpdate);
+    const proposerData = await tx.users.findUnique({
+      where: { id: proposal.proposerId },
+      select: { email: true },
+    });
 
-    return {
-      success: true,
-      updatedItems: allItemsIdsToUpdate.length,
-      proposalId,
-    };
+    const targetItem = await tx.items.findUnique({
+      where: { id: proposal.targetItemId },
+      select: { item_name: true },
+    });
+
+    return { proposerData, targetItem, allItemsIdsToUpdate };
   });
+
+  if (transactionResult) {
+    await emailQueue.add("sendProposalDeclinedEmail", {
+      userEmail: transactionResult.proposerData.email,
+      proposalDetails: {
+        itemName: transactionResult.targetItem.item_name,
+      },
+    });
+  }
+
+  return {
+    success: true,
+    updatedItems: transactionResult.allItemsIdsToUpdate.length,
+    proposalId,
+  };
 }
 
 module.exports = {
