@@ -51,10 +51,23 @@ async function sendAcceptedProposalEmail(userEmail, proposalDetails) {
   console.log(`Email de proposta aceita enviado para ${userEmail}`);
 }
 
+async function sendDeclinedProposalEmail(userEmail, proposalDetails) {
+  const mailOptions = {
+    from: `"App Name" <${process.env.EMAIL_USER}>`,
+    to: userEmail,
+    subject: "Proposta Recusada",
+    html: `<p>Infelizmente, sua proposta para o item ${proposalDetails.itemName} foi recusada.</p>`,
+  };
+
+  await transporter.sendMail(mailOptions);
+  console.log(`Email de proposta recusada enviado para ${userEmail}`);
+}
+
 module.exports = {
   emailService: {
     sendVerificationEmail,
     sendPasswordResetEmail,
     sendAcceptedProposalEmail,
+    sendDeclinedProposalEmail,
   },
 };
