@@ -228,31 +228,31 @@ async function acceptProposal(proposalId, acceptingUserId) {
   };
 }
 
-async function declineProposal(proposalId, DecliningUserId) {
+async function declineProposal(proposalId, decliningUserId) {
   const proposal = await proposalRepository.findByIdWithItems(proposalId);
   if (!proposal) {
     throw new Error("Proposta não encontrada.");
   }
 
-  if (proposal.targetItem.userId !== acceptingUserId) {
+  if (proposal.targetItem.userId !== decliningUserId) {
     throw new Error("Ação não permitida: você não é o dono do item alvo.");
   }
 
   const avaliableItemStatus = await itemStatusRepository.findByName(
     "Disponível"
   );
-  const DeclinedProposalStatus = await proposalStatusRepository.findByName(
+  const declinedProposalStatus = await proposalStatusRepository.findByName(
     "Recusada"
   );
 
-  if (!avaliableItemStatus || !DeclinedProposalStatus) {
+  if (!avaliableItemStatus || !declinedProposalStatus) {
     throw new Error("Status 'Disponível' ou 'Recusada' não encontrado.");
   }
 
   const transactionResult = await prisma.$transaction(async (tx) => {
     await proposalRepository.updateStatus(
       proposalId,
-      DeclinedProposalStatus.id,
+      declinedProposalStatus.id,
       tx
     );
 

@@ -21,7 +21,7 @@ async function findItemStatusByName(name) {
 }
 
 async function findAllItemStatuses() {
-  const itemStatuses = await itemStatusRepository.findAllItemStatuses();
+  const itemStatuses = await itemStatusRepository.findAll();
   return itemStatuses;
 }
 
@@ -49,8 +49,7 @@ async function findProposalStatusByName(name) {
 }
 
 async function findAllProposalStatuses() {
-  const proposalStatuses =
-    await proposalStatusRepository.findAllProposalStatuses();
+  const proposalStatuses = await proposalStatusRepository.findAll();
   return proposalStatuses;
 }
 

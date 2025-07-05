@@ -19,8 +19,8 @@ router.use("/users", userRouter); // Rotas como /users/me, /users/update/:id
 router.use("/items", itemRouter);
 router.use("/proposals", isAuthenticated, proposalRouter);
 router.use("/categories", categoryRouter);
-router.use("/itemStatus", itemStatusRouter);
-router.use("/proposalStatus", proposalStatusRouter);
+router.use("/item-status", itemStatusRouter);
+router.use("/proposal-status", proposalStatusRouter);
 router.use("/upload", uploadRouter);
 
 module.exports = router;
