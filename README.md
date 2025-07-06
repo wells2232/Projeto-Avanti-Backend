@@ -28,7 +28,7 @@ Desenvolver uma aplicação backend robusta, aplicando boas práticas de program
    ```
 3. Configure o banco de dados:
    - Crie um arquivo `.env` na raiz do projeto com as variáveis de ambiente necessárias.
-   - Exemplo de configuração se encontrar no arquivo `.env.example`.
+   - Exemplo de configuração se encontram no arquivo `.env.example`.
 4. Inicie redis com Docker:
    ```bash
    docker run -d -p 6379:6379 --name redis redis
