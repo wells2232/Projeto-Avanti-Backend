@@ -11,7 +11,7 @@ const transporter = nodemailer.createTransport({
 });
 
 async function sendVerificationEmail(userEmail, verificationToken) {
-  const verificationUrl = `http://localhost:3000/verify-email?token=${verificationToken}`;
+  const verificationUrl = `http://localhost:5173/verify-email?token=${verificationToken}`;
 
   const mailOptions = {
     from: `"App Name" <${process.env.EMAIL_USER}>`,
@@ -25,7 +25,7 @@ async function sendVerificationEmail(userEmail, verificationToken) {
 }
 
 async function sendPasswordResetEmail(userEmail, userName, resetToken) {
-  const resetUrl = `http://localhost:3000/reset-password?token=${resetToken}`;
+  const resetUrl = `http://localhost:5173/reset-password?token=${resetToken}`;
 
   const mailOptions = {
     from: `"App Name" <${process.env.EMAIL_USER}>`,

@@ -74,7 +74,13 @@ async function handleGetCurrentUser(req, res) {
 }
 
 async function handleLogout(req, res) {
-  res.clearCookie("accessToken");
+  const cookieOptions = {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: false,
+    path: "/",
+  };
+  res.clearCookie("accessToken", cookieOptions);
   return res.status(200).json({ message: "Logout realizado com sucesso" });
 }
 

@@ -6,11 +6,14 @@ async function createItem(itemData, categoryIds, userId) {
     throw new Error("Imagem e Imagem ID do item são obrigatórios.");
   }
 
+  const availableStatus =
+    await statusRepository.itemStatusRepository.findByName("Disponível");
+
   const dataForRepo = {
     name: itemData.name,
     description: itemData.description,
     conditionId: itemData.conditionId,
-    statusId: itemData.statusId,
+    statusId: availableStatus.id,
     userId: userId,
     image_url: itemData.imageUrl,
     image_public_id: itemData.publicId,

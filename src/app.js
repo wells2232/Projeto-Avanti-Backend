@@ -17,7 +17,7 @@ const mainRouter = require("./routes/index.js");
 const app = express();
 
 const corsOptions = {
-  origin: "http://localhost:5500",
+  origin: "http://localhost:5173",
   credentials: true,
 };
 

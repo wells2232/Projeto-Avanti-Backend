@@ -7,7 +7,6 @@ async function handleCreateItem(req, res) {
       item_name,
       description,
       conditionId,
-      statusId,
       categoryIds,
       imageUrl,
       publicId,
@@ -19,10 +18,11 @@ async function handleCreateItem(req, res) {
       name: item_name,
       description: description,
       conditionId: conditionId,
-      statusId: statusId,
       imageUrl: imageUrl,
       publicId: publicId,
     };
+
+    console.log("Dados do item:", itemData);
 
     const newItem = await itemService.createItem(itemData, categoryIds, userId);
     res.status(201).json(newItem);
