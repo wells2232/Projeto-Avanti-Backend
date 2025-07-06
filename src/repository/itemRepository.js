@@ -137,6 +137,40 @@ async function updateStatus(itemId, statusId, tx) {
   });
 }
 
+async function findById(itemId) {
+  return prisma.items.findUnique({
+    where: { id: itemId },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      condition: {
+        select: {
+          condition: true, // Apenas o nome da condição
+        },
+      },
+      status: {
+        select: {
+          status_name: true, // Apenas o nome do status
+        },
+      },
+      categories: {
+        select: {
+          category: {
+            select: {
+              id: true,
+              category_name: true,
+            },
+          },
+        },
+      },
+    },
+  });
+}
+
 module.exports = {
   create,
   findAllItems,
@@ -144,4 +178,5 @@ module.exports = {
   findUnique,
   updateItem,
   updateStatus,
+  findById,
 };
