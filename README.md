@@ -12,20 +12,39 @@ Desenvolver uma aplicação backend robusta, aplicando boas práticas de program
 - Express
 - PostgresSQL
 - Prisma ORM
+- Docker
+- Redis
 
-## Como Contribuir
+## Como rodar o projeto
 
-1. Faça um fork deste repositório.
-2. Crie uma branch para sua feature: `git checkout -b minha-feature`
-3. Faça commit das suas alterações: `git commit -m 'Adiciona minha feature'`
-4. Faça push para a branch: `git push origin minha-feature`
-5. Abra um Pull Request.
-
-## Organização
-
-- As tarefas serão distribuídas entre os membros do grupo.
-- Utilize issues e pull requests para comunicação e revisão de código.
-- Siga o padrão de código definido pelo grupo.
+1. Clone o repositório:
+   ```bash
+   git clone <URL_DO_REPOSITORIO>
+   cd <NOME_DA_PASTA>
+   ```
+2. Instale as dependências:
+   ```bash
+    npm install
+   ```
+3. Configure o banco de dados:
+   - Crie um arquivo `.env` na raiz do projeto com as variáveis de ambiente necessárias.
+   - Exemplo de configuração se encontram no arquivo `.env.example`.
+4. Inicie redis com Docker:
+   ```bash
+   docker run -d -p 6379:6379 --name redis redis
+   ```
+5. Execute as migrações do Prisma:
+   ```bash
+    npx prisma migrate dev --name init
+   ```
+6. Inicie o servidor:
+   ```bash
+   npm start
+   ```
+7. Inicie o worker do Redis:
+   ```bash
+    node worker.js
+   ```
 
 ## Contato
 
