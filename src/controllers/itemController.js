@@ -38,9 +38,9 @@ async function handleGetAllItems(req, res) {
     const querySchema = z.object({
       page: z.string().transform(Number).optional().default(1),
       limit: z.string().transform(Number).optional().default(10),
-      status_name: z.string().optional(),
-      condition_name: z.string().optional(),
-      category_name: z.string().optional(),
+      conditionId: z.string().optional(),
+      categoryId: z.string().optional(),
+      search: z.string().optional(),
     });
 
     const parsed = querySchema.safeParse(req.query);
@@ -52,20 +52,17 @@ async function handleGetAllItems(req, res) {
       });
     }
 
-    const { page, limit, status_name, condition_name, category_name } =
-      parsed.data;
+    const { page, limit, conditionId, categoryId, search } = parsed.data;
 
     const where = {};
-    if (status_name) where.status.name = status_name;
-    if (condition_name) where.condition.name = condition_name;
-    if (category_name) {
-      where.categories = {
-        some: {
-          category: {
-            category_name: category_name,
-          },
-        },
-      };
+    if (conditionId) {
+      where.conditionId = conditionId;
+    }
+    if (categoryId) {
+      where.categories = { some: { category: { id: categoryId } } };
+    }
+    if (search) {
+      where.item_name = { contains: search, mode: "insensitive" };
     }
 
     console.log("Filtro: ", where);
