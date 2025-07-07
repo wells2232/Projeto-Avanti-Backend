@@ -33,12 +33,12 @@ async function findAllItems(where, page = 1, limit = 10) {
         },
         condition: {
           select: {
-            condition: true, // Apenas o nome da condição
+            condition: true,
           },
         },
         status: {
           select: {
-            status_name: true, // Apenas o nome do status
+            status_name: true,
           },
         },
       },
