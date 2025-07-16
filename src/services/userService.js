@@ -56,6 +56,10 @@ async function register(userData) {
     ...userWithoutPassword
   } = newUser;
 
+  console.log("Usuário registrado:", userWithoutPassword);
+console.log("Token:", token);
+
+
   return { user: userWithoutPassword, token };
 }
 
@@ -66,6 +70,7 @@ async function login(email, password) {
     throw new Error("Credenciais inválidas");
   }
   const isPasswordValid = await bcrypt.compare(password, user.password);
+  console.log(isPasswordValid)
   if (!isPasswordValid) {
     throw new Error("Credenciais inválidas");
   }

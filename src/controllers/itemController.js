@@ -54,15 +54,28 @@ async function handleGetAllItems(req, res) {
 
     const { page, limit, conditionId, categoryId, search } = parsed.data;
 
-    const where = {};
+    const where = { AND: [] };
     if (conditionId) {
-      where.conditionId = conditionId;
+      where.AND.push({ conditionId });
     }
     if (categoryId) {
-      where.categories = { some: { category: { id: categoryId } } };
+      where.AND.push({ categories: { some: { category: { id: categoryId } } } });
     }
     if (search) {
-      where.item_name = { contains: search, mode: "insensitive" };
+      where.AND.push({
+        item_name: {
+          contains: search,
+          mode: "insensitive",
+        },
+        description: {
+          contains: search,
+          mode: "insensitive",
+        },
+      });
+    }
+
+    if (where.AND.length === 0) {
+      delete where.AND;
     }
 
     console.log("Filtro: ", where);

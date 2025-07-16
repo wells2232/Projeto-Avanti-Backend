@@ -10,27 +10,34 @@ async function handleRegister(req, res) {
         .json({ error: "Todos os campos são obrigatórios" });
     }
 
-    const { newUser, token } = await userService.register({
+    const { user, token } = await userService.register({
       name,
       email,
       password,
     });
 
+    console.log("Token gerado:", token);
+
+
     res.cookie("accessToken", token, {
       httpOnly: true,
-      // secure: process.env.NODE_ENV === "production", // Use secure cookies in production
-      sameSite: "None",
+      sameSite: "lax",
       secure: false,
       path: "/",
-      maxAge: 24 * 60 * 60 * 1000, // 1 day
+      maxAge: 24 * 60 * 60 * 1000, // 1 dia
     });
 
     return res
       .status(201)
-      .json({ message: "Usuário registrado com sucesso", user: newUser });
+      .json({ message: "Usuário registrado com sucesso", user });
   } catch (error) {
     if (error.message === "Este e-mail já está em uso") {
-      return res.status(409).json({ type: "Conflict", message: error.message });
+      return res.status(409).json({
+        message: 'Um ou mais campos estão inválidos!',
+        errors: {
+          email: ['Este e-mail já está em uso']
+        }
+      });
     }
     console.error("Erro ao registrar usuário:", error);
     return res.status(500).json({ error: "Erro interno do servidor" });
