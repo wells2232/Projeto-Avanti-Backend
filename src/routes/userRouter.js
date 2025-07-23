@@ -5,7 +5,7 @@ const { isAuthenticated } = require("../middlewares/authMiddleware");
 
 const userRouter = Router();
 
-userRouter.post("/auth/register", validateRegister, (req, res, next) =>
+userRouter.post("/auth/register", validateRegister,  (req, res, next) =>
   userController.handleRegister(req, res, next)
 );
 

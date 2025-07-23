@@ -1,6 +1,6 @@
 const prisma = require("../lib/prisma");
 
-async function findAllItems(where, page = 1, limit = 10) {
+async function findAllItems(where, page = 1, limit = 10, orderBy) {
   const skip = (page - 1) * limit;
 
   const [items, total] = await Promise.all([
@@ -8,7 +8,7 @@ async function findAllItems(where, page = 1, limit = 10) {
       where,
       skip: skip,
       take: limit,
-      orderBy: { created_at: "desc" },
+      orderBy: orderBy,
       select: {
         id: true,
         item_name: true,
@@ -20,7 +20,8 @@ async function findAllItems(where, page = 1, limit = 10) {
             category: {
               select: {
                 id: true,
-                category_name: true,
+                name: true,
+                slug: true,
               },
             },
           },
@@ -29,16 +30,20 @@ async function findAllItems(where, page = 1, limit = 10) {
           select: {
             id: true,
             name: true,
+            city: true,
+            state: true,
           },
         },
         condition: {
           select: {
-            condition: true,
+            name: true,
+            slug: true,
           },
         },
         status: {
           select: {
-            status_name: true,
+            name: true,
+            slug: true,
           },
         },
       },
@@ -162,7 +167,42 @@ async function findById(itemId) {
           category: {
             select: {
               id: true,
-              category_name: true,
+              name: true,
+            },
+          },
+        },
+      },
+    },
+  });
+}
+
+async function findItemsByUserId(userId, page, limit) {
+  return prisma.items.findMany({
+    where: { userId: userId },
+    skip: (page - 1) * limit,
+    take: limit,
+    include: {
+      status: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+        },
+      },
+      condition: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+        },
+      },
+      categories: {
+        select: {
+          category: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
             },
           },
         },
@@ -179,4 +219,5 @@ module.exports = {
   updateItem,
   updateStatus,
   findById,
+  findItemsByUserId,
 };

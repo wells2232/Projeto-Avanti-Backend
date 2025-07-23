@@ -2,12 +2,20 @@ const Filter = require("bad-words");
 const filter = new Filter();
 
 function validateRegister(req, res, next) {
-  const { name, email, password } = req.body;
 
-  if (!name || name.trim().length < 3) {
+  // Verifica se o corpo da requisição contém os campos necessários
+  if (!req.body ) {
     return res
       .status(400)
-      .json({ message: "Nome deve ter pelo menos 3 letras." });
+      .json({ message: "Nome, email e senha são obrigatórios." });
+  }
+
+  const { name, email, password } = req.body;
+
+  if (!name || name.trim().length < 2) {
+    return res
+      .status(400)
+      .json({ message: "Nome deve ter pelo menos 2 letras." });
   }
 
   if (filter.isProfane(name)) {

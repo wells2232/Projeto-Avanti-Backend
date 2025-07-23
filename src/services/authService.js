@@ -6,6 +6,7 @@ const bcrypt = require("bcryptjs");
 
 async function verifyUserEmail(token) {
   const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+  crypto.hash("sha256").update(token).digest("hex");
 
   const user = await prisma.users.findFirst({
     where: {
@@ -83,7 +84,10 @@ async function resetUserPassword(token, newPassword) {
   });
 
   if (!user) {
-    throw new Error("Token de redefinição de senha inválido ou expirado");
+    throw new Error("Token de redefinição de senha inválido ou expirado", {
+      statusCode: 400,
+    });
+
   }
 
   const hashedPassword = await bcrypt.hash(newPassword, 10);

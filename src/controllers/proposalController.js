@@ -3,8 +3,10 @@ const proposalService = require("../services/proposalService");
 // Requisita as propostas feita pelo current user
 async function handleCreateProposal(req, res) {
   try {
-    const { message, targetItemId, offeredItemIds } = req.body;
+    const { message, itemId: targetItemId, offeredItemsIds } = req.body;
+   
     const proposerId = req.user.id;
+    console.log("Proposer ID:", proposerId);
 
     // Validar se o usuário está autenticado
     if (!proposerId) {
@@ -15,13 +17,13 @@ async function handleCreateProposal(req, res) {
       message,
       targetItemId,
     };
-
-    //console.log("Offered Items IDs:", offeredItemIds);
+    
+    console.log("Proposal Data:", proposalData);
 
     // Chamar o serviço para criar a proposta
     const newProposal = await proposalService.createProposal(
       proposalData,
-      offeredItemIds,
+      offeredItemsIds,
       proposerId
     );
 

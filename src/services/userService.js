@@ -6,7 +6,7 @@ const { emailQueue } = require("../config/queue");
 const prisma = require("../lib/prisma");
 
 async function register(userData) {
-  const { name, email, password } = userData;
+  const { name, email, password, city, state } = userData;
 
   const existingUser = await userRepository.findUserByEmail(email);
   if (existingUser) {
@@ -31,6 +31,8 @@ async function register(userData) {
     password: hashedPassword,
     emailVerificationToken: hashedToken,
     emailVerificationTokenExpiresAt: tokenExpiration,
+    city,
+    state,
   });
 
   await emailQueue.add("send-verification-email", {
@@ -56,6 +58,10 @@ async function register(userData) {
     ...userWithoutPassword
   } = newUser;
 
+  console.log("Usuário registrado:", userWithoutPassword);
+console.log("Token:", token);
+
+
   return { user: userWithoutPassword, token };
 }
 
@@ -66,6 +72,7 @@ async function login(email, password) {
     throw new Error("Credenciais inválidas");
   }
   const isPasswordValid = await bcrypt.compare(password, user.password);
+  console.log(isPasswordValid)
   if (!isPasswordValid) {
     throw new Error("Credenciais inválidas");
   }

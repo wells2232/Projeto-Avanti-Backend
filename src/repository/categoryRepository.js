@@ -3,7 +3,7 @@ const prisma = require("../lib/prisma");
 async function createCategory(name) {
   const category = await prisma.category.create({
     data: {
-      category_name: name,
+      name: name,
     },
   });
   return category;
@@ -12,11 +12,12 @@ async function createCategory(name) {
 async function findAllCategories() {
   const categories = await prisma.category.findMany({
     orderBy: {
-      category_name: "asc",
+      name: "asc",
     },
     select: {
       id: true,
-      category_name: true,
+      name: true,
+      slug: true,
     },
   });
   return categories;

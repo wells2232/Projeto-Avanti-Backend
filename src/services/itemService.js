@@ -64,8 +64,8 @@ async function updateStatus(itemId, statusId, tx) {
   return await itemRepository.updateStatus(itemId, statusId, tx);
 }
 
-async function findAllItems(where, page = 1, limit = 10) {
-  return await itemRepository.findAllItems(where, page, limit);
+async function findAllItems(where,  page = 1, limit = 10, orderBy) {
+  return await itemRepository.findAllItems(where, page, limit, orderBy);
 }
 
 async function deleteItem(itemId, userId) {
@@ -105,10 +105,18 @@ async function findItemById(itemId) {
   return await itemRepository.findById(itemId);
 }
 
+async function findItemsByUserId(userId, page = 1, limit = 10) {
+  if (!userId) {
+    throw new Error("ID do usuário não fornecido.");
+  }
+  return await itemRepository.findItemsByUserId(userId, page, limit);
+}
+
 module.exports = {
   createItem,
   findAllItems,
   deleteItem,
+  findItemsByUserId,
   findItemById,
   updateItem,
   updateStatus,
