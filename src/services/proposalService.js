@@ -27,6 +27,8 @@ async function createProposal(proposalData, offeredItemIds, proposerId) {
     throw new Error("Status padrão 'Pendente' não encontrado.");
   }
 
+  console.log('offeredItemIds:', offeredItemIds);
+
   // Validar se offeredItemIds é um array
   if (!Array.isArray(offeredItemIds) || offeredItemIds.length === 0) {
     throw new Error("Deve fornecer pelo menos um item para oferecer.");
@@ -59,6 +61,8 @@ async function createProposal(proposalData, offeredItemIds, proposerId) {
     select: { userId: true },
   });
 
+  console.log("Target Item:", targetItem);
+
   if (!targetItem) {
     throw new Error("Item alvo não encontrado.");
   }
@@ -80,13 +84,15 @@ async function createProposal(proposalData, offeredItemIds, proposerId) {
     );
   }
 
-  const reservedStatus = await itemStatusRepository.findByName("Reservado");
+  const negotiatingStatus = await itemStatusRepository.findByName("Em negociação");
+
 
   const itemsToUpdate = [targetItemId, ...offeredItemIds].map((itemId) =>
-    itemService.updateStatus(itemId, reservedStatus.id)
+    itemService.updateStatus(itemId, negotiatingStatus.id)
   );
 
-  // Atualiza o status dos itens oferecidos para "Reservado"
+
+  // Atualiza o status dos itens oferecidos para "Em Negociação"
   await Promise.all(itemsToUpdate);
 
   const dataForRepo = {

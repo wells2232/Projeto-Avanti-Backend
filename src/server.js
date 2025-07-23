@@ -1,5 +1,4 @@
 require("dotenv").config();
-const express = require("express");
 const app = require("./app").app; // Importa o app do arquivo app.js
 
 const PORT = process.env.PORT || 3000;

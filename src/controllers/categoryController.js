@@ -1,12 +1,14 @@
 const categoryService = require("../services/categoryService");
 
 async function handleCreateCategory(req, res) {
-  const { categoryName } = req.body;
+  const { name } = req.body;
+  const slug = slugify(name);
   try {
-    const { category_name } = await categoryService.createCategory(
-      categoryName
+    const { name, slug } = await categoryService.createCategory(
+      name,
+      slug
     );
-    res.status(201).json({ category_name });
+    res.status(201).json({ name });
   } catch (error) {
     console.error("Error creating category:", error);
     res.status(500).json({ error: error.message || "Internal Server Error" });

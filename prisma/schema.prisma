@@ -38,23 +38,26 @@ model Items {
 
 model ItemStatuses {
   id          String  @id @default(uuid()) @db.Uuid
-  status_name String  @unique
+  name        String  @unique
+  slug        String  @unique
   description String?
   Items       Items[]
 }
 
 model ItemConditions {
-  id          String  @id @default(uuid()) @db.Uuid
-  condition   String  @unique
-  description String?
-  Items       Items[]
+  id         String   @id @default(uuid()) @db.Uuid
+  name       String   @unique
+  slug       String   @unique
+  created_at DateTime @default(now())
+  Items      Items[]
 }
 
 model Category {
-  id            String         @id @default(uuid()) @db.Uuid
-  category_name String         @unique
-  created_at    DateTime       @default(now())
-  ItemCategory  ItemCategory[]
+  id           String         @id @default(uuid()) @db.Uuid
+  name         String         @unique
+  slug         String         @unique
+  created_at   DateTime       @default(now())
+  ItemCategory ItemCategory[]
 }
 
 model ItemCategory {
@@ -79,8 +82,8 @@ model Users {
   email      String   @unique
   password   String
   phone      String?
-  address    String?
   city       String?
+  state      String?
   created_at DateTime @default(now())
 
   role Role @default(USER)
@@ -125,6 +128,7 @@ model ProposalOfferedItems {
 model ProposalStatuses {
   id          String     @id @default(uuid()) @db.Uuid
   status_name String     @unique
+  slug        String     @unique
   description String?
   Proposal    Proposal[]
 }

@@ -4,7 +4,7 @@ const prisma = require("../lib/prisma");
 async function createItemStatus(name, description) {
   const itemStatus = await prisma.itemStatuses.create({
     data: {
-      status_name: name,
+      name: name,
       description: description,
     },
   });
@@ -14,7 +14,7 @@ async function createItemStatus(name, description) {
 async function findItemStatusByName(name) {
   return await prisma.itemStatuses.findUnique({
     where: {
-      status_name: name,
+      name: name,
     },
   });
 }
@@ -22,12 +22,12 @@ async function findItemStatusByName(name) {
 async function findAllItemStatuses() {
   const itemStatuses = await prisma.itemStatuses.findMany({
     orderBy: {
-      status_name: "asc",
+      name: "asc",
     },
     select: {
       id: true,
-      status_name: true,
-      description: true,
+      name: true,
+      slug: true,
     },
   });
   return itemStatuses;

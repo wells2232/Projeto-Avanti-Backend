@@ -6,7 +6,7 @@ const { emailQueue } = require("../config/queue");
 const prisma = require("../lib/prisma");
 
 async function register(userData) {
-  const { name, email, password } = userData;
+  const { name, email, password, city, state } = userData;
 
   const existingUser = await userRepository.findUserByEmail(email);
   if (existingUser) {
@@ -31,6 +31,8 @@ async function register(userData) {
     password: hashedPassword,
     emailVerificationToken: hashedToken,
     emailVerificationTokenExpiresAt: tokenExpiration,
+    city,
+    state,
   });
 
   await emailQueue.add("send-verification-email", {

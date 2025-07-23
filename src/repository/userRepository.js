@@ -12,6 +12,14 @@ async function findUserByEmail(email) {
   });
 }
 
+async function findUserById(id) {
+  return await prisma.users.findUnique({
+    where: {
+      id: id,
+    },
+  });
+}
+
 async function create(userData) {
   return await prisma.users.create({
     data: userData,
@@ -30,6 +38,7 @@ async function update(id, userData) {
 module.exports = {
   findAllUsers,
   findUserByEmail,
+  findUserById,
   create,
   update,
 };

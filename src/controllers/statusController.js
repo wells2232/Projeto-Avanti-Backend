@@ -6,10 +6,12 @@ const {
 // ----- Item Status Controller -----
 async function handleCreateItemStatus(req, res) {
   const { name, description } = req.body;
+  const slug = slugify(name);
   try {
     const itemStatus = await itemStatusService.createItemStatus(
       name,
-      description
+      description,
+      slug
     );
     res.status(201).json(itemStatus);
   } catch (error) {

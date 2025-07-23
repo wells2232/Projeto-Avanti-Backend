@@ -1,8 +1,9 @@
 const userService = require("../services/userService");
+const userRepository = require("../repository/userRepository");
 
 async function handleRegister(req, res) {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, city, state } = req.body;
 
     if (!name || !email || !password) {
       return res
@@ -14,6 +15,8 @@ async function handleRegister(req, res) {
       name,
       email,
       password,
+      city,
+      state
     });
 
     console.log("Token gerado:", token);
@@ -70,9 +73,12 @@ async function handleLogin(req, res) {
 async function handleGetCurrentUser(req, res) {
   try {
     const user = req.user;
-    if (!user) {
+    // Verifica se o usuário está autenticado e se existe no banco de dados
+    const dbUser = await userRepository.findUserById(user.id);
+    if (!dbUser) {
       return res.status(401).json({ error: "Usuário não autenticado" });
     }
+
     return res.status(200).json(user);
   } catch (error) {
     console.error("Erro ao obter usuário atual:", error);
@@ -88,6 +94,8 @@ async function handleLogout(req, res) {
     path: "/",
   };
   res.clearCookie("accessToken", cookieOptions);
+  console.log(res.cookies);
+  console.log("Usuário deslogado com sucesso");
   return res.status(200).json({ message: "Logout realizado com sucesso" });
 }
 
