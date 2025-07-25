@@ -150,22 +150,24 @@ async function findById(itemId) {
         select: {
           id: true,
           name: true,
+          city: true,
+          state: true,
         },
       },
       condition: {
         select: {
-          condition: true, // Apenas o nome da condição
+          name: true, // Apenas o nome da condição
         },
       },
       status: {
         select: {
-          status_name: true, // Apenas o nome do status
+          name: true, // Apenas o nome do status
         },
       },
       categories: {
         select: {
           category: {
-            select: {
+            select: { 
               id: true,
               name: true,
             },

@@ -45,6 +45,15 @@ const worker = new Worker(
         console.log("Enviando email de proposta recusada...");
         return;
       }
+      case "sendProposalReceived": {
+        const { userEmail, proposalDetails } = job.data;
+        await emailService.sendProposalReceivedEmail(
+          userEmail,
+          proposalDetails
+        );
+        console.log("Enviando email de proposta recebida...");
+        return;
+      }
       default:
         throw new Error(`Job desconhecido: ${job.name}`);
     }

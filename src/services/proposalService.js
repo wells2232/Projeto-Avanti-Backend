@@ -58,7 +58,7 @@ async function createProposal(proposalData, offeredItemIds, proposerId) {
 
   const targetItem = await prisma.items.findUnique({
     where: { id: targetItemId },
-    select: { userId: true },
+    select: { userId: true, item_name: true },
   });
 
   console.log("Target Item:", targetItem);
@@ -95,6 +95,8 @@ async function createProposal(proposalData, offeredItemIds, proposerId) {
   // Atualiza o status dos itens oferecidos para "Em Negociação"
   await Promise.all(itemsToUpdate);
 
+  
+
   const dataForRepo = {
     message,
     proposerId,
@@ -103,6 +105,23 @@ async function createProposal(proposalData, offeredItemIds, proposerId) {
   };
 
   const proposal = await proposalRepository.create(dataForRepo, offeredItemIds);
+
+  const targetItemOwner = await prisma.users.findUnique({
+    where: { id: targetItem.userId },
+    select: { email: true, name: true },
+  });
+
+  if (proposal) {
+    await emailQueue.add("sendProposalReceived", {
+      userEmail: targetItemOwner.email,
+      proposalDetails: {
+        itemOwnerName: targetItemOwner.name,
+        itemName: targetItem.item_name,
+      },
+    });
+  }
+
+
   return proposal;
 }
 

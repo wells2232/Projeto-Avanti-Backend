@@ -225,6 +225,8 @@ async function handleGetItemById(req, res) {
       return res.status(404).json({ message: "Item não encontrado." });
     }
 
+    console.log("Item encontrado:", item);
+
     const formattedItem = {
       id: item.id,
       itemName: item.item_name,
@@ -240,7 +242,10 @@ async function handleGetItemById(req, res) {
       user: {
         id: item.user.id,
         name: item.user.name,
+        city: item.user.city,
+        state: item.user.state,
       },
+      createdAt: item.created_at.toLocaleDateString(),
     };
 
     res.status(200).json(formattedItem);

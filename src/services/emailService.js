@@ -14,7 +14,7 @@ async function sendVerificationEmail(userEmail, verificationToken) {
   const verificationUrl = `http://localhost:5173/verify-email?token=${verificationToken}`;
 
   const mailOptions = {
-    from: `"App Name" <${process.env.EMAIL_USER}>`,
+    from: `"Trade Circle" <${process.env.EMAIL_USER}>`,
     to: userEmail,
     subject: "Verificação de Email",
     html: `<p>Clique <a href="${verificationUrl}">aqui</a> para verificar seu email.</p>`,
@@ -63,9 +63,22 @@ async function sendDeclinedProposalEmail(userEmail, proposalDetails) {
   console.log(`Email de proposta recusada enviado para ${userEmail}`);
 }
 
+async function sendProposalReceivedEmail(userEmail, proposalDetails) {
+  const mailOptions = {
+    from: `"Trade Circle" <${process.env.EMAIL_USER}>`,
+    to: userEmail,
+    subject: "Nova Proposta Recebida",
+    html: `<p>Você recebeu uma nova proposta para o item ${proposalDetails.itemName}.</p>`,
+  };
+
+  await transporter.sendMail(mailOptions);
+  console.log(`Email de proposta recebida enviado para ${userEmail}`);
+}
+
 module.exports = {
   emailService: {
     sendVerificationEmail,
+    sendProposalReceivedEmail,
     sendPasswordResetEmail,
     sendAcceptedProposalEmail,
     sendDeclinedProposalEmail,
