@@ -14,7 +14,8 @@
   - Implementação de cache com Redis.
   - Testes da API com Postman.
 - Vladimir:
-  - Validações de dados e regras de negócio para Usuários.
-  - Validações de dados e regras de negócio para Items.
+  - Mapeamento de dados e regras de negócio para Usuários.
+  - Mapeamento de validações de dados e regras de negócio para Items.
 - Fernanda:
-  - Validações de dados e regras de negócio para Propostas.
+  - Mapeamento de validações de dados e regras de negócio para Propostas.
+  - Mapeamento de dados e regras de negócio para Usuários e Items.
