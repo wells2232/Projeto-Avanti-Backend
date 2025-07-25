@@ -25,7 +25,7 @@ async function sendVerificationEmail(userEmail, verificationToken) {
 }
 
 async function sendPasswordResetEmail(userEmail, userName, resetToken) {
-  const resetUrl = `http://localhost:5173/reset-password?token=${resetToken}`;
+  const resetUrl = `http://localhost:5173/password/reset?token=${resetToken}`;
 
   const mailOptions = {
     from: `"App Name" <${process.env.EMAIL_USER}>`,
