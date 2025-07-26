@@ -116,9 +116,6 @@ async function changePassword(userId, currentPassword, newPassword) {
   const user = await prisma.users.findUnique({
     where: { id: userId },
   });
-  if (!user) {
-    throw new Error("Usuário não encontrado");
-  }
 
   const isCurrentPasswordValid = await bcrypt.compare(
     currentPassword,

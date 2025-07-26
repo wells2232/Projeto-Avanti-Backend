@@ -23,9 +23,9 @@ async function handleRegister(req, res) {
 
 
     res.cookie("accessToken", token, {
-      httpOnly: true,
+      httpOnly: false,
       sameSite: "lax",
-      secure: false,
+      secure: true,
       path: "/",
       maxAge: 24 * 60 * 60 * 1000, // 1 dia
     });
@@ -57,9 +57,9 @@ async function handleLogin(req, res) {
     const { token } = await userService.login(email, password);
 
     res.cookie("accessToken", token, {
-      httpOnly: true,
+      httpOnly: false,
       sameSite: "lax",
-      secure: false,
+      secure: true,
       path: "/",
       maxAge: 24 * 60 * 60 * 1000, // 1 dia
     });

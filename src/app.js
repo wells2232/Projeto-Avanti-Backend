@@ -17,8 +17,7 @@ const mainRouter = require("./routes/index.js");
 const app = express();
 
 const corsOptions = {
-  // Permite requisições de qualquer origem
-  origin: 'http://localhost:5173',
+  origin: ["https://projeto-avanti-frontend.vercel.app", "http://localhost:5173"],
   credentials: true,
 };
 
