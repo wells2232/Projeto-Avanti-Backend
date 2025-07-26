@@ -17,10 +17,11 @@ userRouter.get(
   "/auth/me",
   isAuthenticated,
   userController.handleGetCurrentUser
+
 );
 
 userRouter.patch(
-  "/user/update/:id",
+  "/update/:id",
   isAuthenticated,
   userController.handleUpdateUser
 );

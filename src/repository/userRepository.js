@@ -31,7 +31,12 @@ async function update(id, userData) {
     where: {
       id: id,
     },
-    data: userData,
+    data: {
+      email: userData.email,
+      name: userData.name,
+      city: userData.city,
+      state: userData.state,
+    }
   });
 }
 
