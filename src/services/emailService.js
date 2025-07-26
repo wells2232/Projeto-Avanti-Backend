@@ -28,7 +28,7 @@ async function sendPasswordResetEmail(userEmail, userName, resetToken) {
   const resetUrl = `http://localhost:5173/password/reset?token=${resetToken}`;
 
   const mailOptions = {
-    from: `"App Name" <${process.env.EMAIL_USER}>`,
+    from: `"Trade Circle" <${process.env.EMAIL_USER}>`,
     to: userEmail,
     subject: "Redefinição de Senha",
     html: `<p>Olá, ${userName}! Clique <a href="${resetUrl}">aqui</a> para redefinir sua senha.</p>`,
@@ -41,7 +41,7 @@ async function sendPasswordResetEmail(userEmail, userName, resetToken) {
 async function sendAcceptedProposalEmail(userEmail, proposalDetails) {
   console.log('Sending accepted proposal email:', proposalDetails);
   const mailOptions = {
-    from: `"App Name" <${process.env.EMAIL_USER}>`,
+    from: `"Trade Circle" <${process.env.EMAIL_USER}>`,
     to: userEmail,
     subject: "Proposta Aceita",
     html: `<div>
@@ -63,7 +63,7 @@ async function sendAcceptedProposalEmail(userEmail, proposalDetails) {
 
 async function sendDeclinedProposalEmail(userEmail, proposalDetails) {
   const mailOptions = {
-    from: `"App Name" <${process.env.EMAIL_USER}>`,
+    from: `"Trade Circle" <${process.env.EMAIL_USER}>`,
     to: userEmail,
     subject: "Proposta Recusada",
     html: `<p>Infelizmente, sua proposta para o item ${proposalDetails.itemName} foi recusada.</p>`,
