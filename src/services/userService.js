@@ -93,17 +93,19 @@ async function login(email, password) {
 async function updateUser(id, userData) {
   const dataForRepo = userData;
 
+  console.log("Dados para atualização do usuário:", dataForRepo);
+
+  const currentUser = await userRepository.findUserById(id);
+
   const user = await userRepository.findUserByEmail(userData.email);
-  if (user && user.id !== id) {
+
+  if (currentUser.email === userData.email) {
+    const { name, city, state } = await userRepository.update(id, dataForRepo);
+    return { name, city, state };
+  } else if (user.email === userData.email) {
     throw new Error("Este e-mail já está em uso");
   }
-
-  if (!userData.email) {
-    dataForRepo.email = user.email.trim().toLowerCase();
-  }
-
-  const updatedUser = await userRepository.update(id, dataForRepo);
-  return updatedUser;
+ 
 }
 
 async function changePassword(userId, currentPassword, newPassword) {

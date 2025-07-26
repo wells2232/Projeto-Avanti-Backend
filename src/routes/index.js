@@ -16,7 +16,7 @@ const router = Router();
 
 // Define o caminho base para cada roteador modular
 router.use("/auth", authRouter);
-router.use("/users", userRouter); // Rotas como /users/me, /users/update/:id
+router.use("/user", userRouter); // Rotas como /users/me, /users/update/:id
 router.use("/items", itemRouter);
 router.use("/proposals", isAuthenticated, proposalRouter);
 router.use("/categories", categoryRouter);
