@@ -66,7 +66,10 @@ async function handleGetAllItems(req, res) {
       [orderBy]: orderDirection,
     };
 
-    const where = { AND: [] };
+    const where = { // filtra itens com status diferente de "trocado"
+      AND: [],
+      status: { slug: { not: "trocado" } },
+    };
     if (conditionSlug) {
       where.AND.push({ condition: { slug: conditionSlug } });
     }
@@ -122,8 +125,10 @@ async function handleGetAllItems(req, res) {
     if (where.AND.length === 0) {
       delete where.AND;
     }
-  
 
+    console.log("Where clause:", where);
+
+    
     const result = await itemService.findAllItems(where,  page, limit, orderByClause);
 
     const formattedItems = result.items.map((item) => ({

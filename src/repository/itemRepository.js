@@ -5,6 +5,13 @@ async function findAllItems(where, page = 1, limit = 10, orderBy) {
 
   const [items, total] = await Promise.all([
     prisma.items.findMany({
+      where: {
+        ...where,
+        AND: [
+  
+          { status: { slug: { not: "trocado" } } },
+        ],
+      },
       skip: skip,
       take: limit,
       orderBy: orderBy,
@@ -51,6 +58,7 @@ async function findAllItems(where, page = 1, limit = 10, orderBy) {
       where,
     }),
   ]);
+  
 
   return {
     items,

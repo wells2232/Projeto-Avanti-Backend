@@ -80,7 +80,7 @@ async function createProposal(proposalData, offeredItemIds, proposerId) {
   //se a proposta existir vai aparecer essa mensagem
   if (existingProposal) {
     throw new Error(
-      "Já existe uma proposta para este item alvo por este usuário."
+      "Você já fez uma proposta para este item. Por favor, aguarde a resposta do proprietário."
     );
   }
 
